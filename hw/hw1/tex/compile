@@ -5,7 +5,7 @@
 # --natbib  =>  use the natbib package in latex
 # -o        =>  output file name
 
-pandoc hw1.md -s --natbib -o hw1.tex
+pandoc hw1.md -s -o hw1.tex
 
 pdflatex *.tex
 bibtex *.aux

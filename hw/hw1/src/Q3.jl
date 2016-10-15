@@ -84,21 +84,48 @@ R"plotPosts(cbind(lam_d,alp_d),c('lambda','alpha'),legend.pos='right')";
 
 #AFT Models
 include("AFT.jl")
-init = AFT.State_weib(1,zeros(2),1,zeros(Int,2))
+init = AFT.State_aft(1,zeros(2),1,zeros(Int,2))
 const N = length(y_all)
-#m=0;s2=1;a=2;b=3;css=1;csb0=1;csb1=3
-@time aft_out = AFT.aft(y_all, x_all, v_all, init, 
-                        zeros(2), ones(2), [1,3], 
-                        2,3,1,printFreq=10,B=B,burn=burn)
-aft_out[end].sig_acc / B
-aft_out[end].beta_acc / B
-aft_sig = map(o -> o.sig, aft_out)
-aft_b0 = map(o -> o.beta[1], aft_out)
-aft_b1 = map(o -> o.beta[2], aft_out)
 
-@rput aft_sig aft_b0 aft_b1
-R"plotPosts(cbind(aft_sig, aft_b0, aft_b1),legend.pos='right',cex.l=.8,show.x=F)";
+# Weibull
+@time aft_weib = AFT.aft(y_all, x_all, v_all, init, 
+                         zeros(2), ones(2), [1,1], 
+                         2,3,1,printFreq=10,B=B,burn=5000);
+
+aft_weib_sig = map(o -> o.sig, aft_weib)
+aft_weib_b0 = map(o -> o.beta[1], aft_weib)
+aft_weib_b1 = map(o -> o.beta[2], aft_weib)
+
+@rput aft_weib_sig aft_weib_b0 aft_weib_b1
+R"plotPosts(cbind(aft_weib_sig, aft_weib_b0, aft_weib_b1),legend.pos='right',cex.l=.8,show.x=F)"; println()
+
+# LogLogistic
+@time aft_loglog = AFT.aft(y_all, x_all, v_all, init, 
+                           zeros(2), ones(2), [1,1], 
+                           2,3,1,printFreq=10,B=B,burn=5000,model="loglogistic");
+
+aft_loglog_sig = map(o -> o.sig, aft_loglog)
+aft_loglog_b0 = map(o -> o.beta[1], aft_loglog)
+aft_loglog_b1 = map(o -> o.beta[2], aft_loglog)
+
+@rput aft_loglog_sig aft_loglog_b0 aft_loglog_b1
+R"plotPosts(cbind(aft_loglog_sig, aft_loglog_b0, aft_loglog_b1),legend.pos='right',cex.l=.8,show.x=F)"; println()
+
+# LogNormal
+@time aft_logNorm = AFT.aft(y_all, x_all, v_all, init, 
+                            zeros(2), ones(2), [1,1], 
+                            2,3,1,printFreq=10,B=B,burn=5000,model="lognormal");
+
+aft_logNorm_sig = map(o -> o.sig, aft_logNorm)
+aft_logNorm_b0 = map(o -> o.beta[1], aft_logNorm)
+aft_logNorm_b1 = map(o -> o.beta[2], aft_logNorm)
+
+@rput aft_logNorm_sig aft_logNorm_b0 aft_logNorm_b1
+R"plotPosts(cbind(aft_logNorm_sig, aft_logNorm_b0, aft_logNorm_b1),legend.pos='right',cex.l=.8,show.x=F)"; println()
 
 #=
 include("Q3.jl")
+R"weib_mod <- survreg(Surv(time, delta) ~ as.factor(type), dist='weibull', data=tongue)"
+R"loglogistic_mod <- survreg(Surv(time, delta) ~ as.factor(type), dist='loglogistic', data=tongue)"
+R"lognormal_mod <- survreg(Surv(time, delta) ~ as.factor(type), dist='lognormal', data=tongue)" 
 =#

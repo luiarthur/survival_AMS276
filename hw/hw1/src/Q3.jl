@@ -77,8 +77,12 @@ alp_d = map(o->o.alpha, out_d)
 acc_d = out_d[end].alpha_acc / length(out_d)
 
 @rput lam_a alp_a lam_d alp_d;
+R"pdf('../img/post_a.pdf')"
 R"plotPosts(cbind(lam_a,alp_a),c('lambda','alpha'),legend.pos='right')";
+R"dev.off()"
+R"pdf('../img/post_b.pdf')"
 R"plotPosts(cbind(lam_d,alp_d),c('lambda','alpha'),legend.pos='right')";
+R"dev.off()"
 
 #################################
 
@@ -97,7 +101,9 @@ aft_weib_b0 = map(o -> o.beta[1], aft_weib)
 aft_weib_b1 = map(o -> o.beta[2], aft_weib)
 
 @rput aft_weib_sig aft_weib_b0 aft_weib_b1
+R"pdf('../img/aft_weib.pdf')"
 R"plotPosts(cbind(aft_weib_sig, aft_weib_b0, aft_weib_b1),legend.pos='right',cex.l=.8,show.x=F)"; println()
+R"dev.off()"
 
 # LogLogistic
 @time aft_loglog = AFT.aft(y_all, x_all, v_all, init, 
@@ -109,7 +115,9 @@ aft_loglog_b0 = map(o -> o.beta[1], aft_loglog)
 aft_loglog_b1 = map(o -> o.beta[2], aft_loglog)
 
 @rput aft_loglog_sig aft_loglog_b0 aft_loglog_b1
+R"pdf('../img/aft_loglog.pdf')"
 R"plotPosts(cbind(aft_loglog_sig, aft_loglog_b0, aft_loglog_b1),legend.pos='right',cex.l=.8,show.x=F)"; println()
+R"dev.off()"
 
 # LogNormal
 @time aft_logNorm = AFT.aft(y_all, x_all, v_all, init, 
@@ -121,7 +129,9 @@ aft_logNorm_b0 = map(o -> o.beta[1], aft_logNorm)
 aft_logNorm_b1 = map(o -> o.beta[2], aft_logNorm)
 
 @rput aft_logNorm_sig aft_logNorm_b0 aft_logNorm_b1
+R"pdf('../img/aft_lognorm.pdf')"
 R"plotPosts(cbind(aft_logNorm_sig, aft_logNorm_b0, aft_logNorm_b1),legend.pos='right',cex.l=.8,show.x=F)"; println()
+R"dev.off()"
 
 #=
 include("Q3.jl")

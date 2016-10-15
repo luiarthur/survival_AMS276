@@ -33,6 +33,11 @@ header-includes:
     - \newcommand{\pdd}[2]{ \frac{\partial^2#1}{\partial{#2}^2} }
     - \newcommand{\N}{ \mathcal{N} }
     - \newcommand{\E}{ \text{E} }
+    # Figures in correct place
+    - \usepackage{float}
+    - \def\beginmyfig{\begin{figure}[H]\center}
+    - \def\endmyfig{\end{figure}}
+    # 
     - \allowdisplaybreaks
 ---
 
@@ -100,6 +105,7 @@ p(\theta | y) &\propto \theta^{\alpha_0-1}\exp\bc{-\theta\lambda_0}
                                    \lambda_0+ \ds\sum_{\bc{i:x_i=1}} y_i}
 \end{align*}
 
+***
 
 ##2a
 Supposing that $\alpha$ is known,
@@ -124,6 +130,38 @@ p(z|y) &= \int_0^\infty p(z|\gamma)p(\gamma|y)d\gamma \\
 &= \frac{\alpha z^{\alpha-1}b^a}{\Gamma(a)}\int_0^\infty \gamma^a \exp\p{-\gamma(z^\alpha+b)}d\lambda\\
 &= \frac{\alpha z^{\alpha-1}b^a\Gamma(a+1)}{\Gamma(a)(z^\alpha+b)^{a+1}} \\
 &= \frac{\alpha a z^{\alpha-1}b^a}{(z^\alpha+b)^{a+1}} \\
-&= \ds\frac{\alpha \p{\sua} z^{\alpha-1}{\sub}^{\sua}}{(z^\alpha+\sub)^{\sua+1}} \\
+&= \ds\frac{\alpha \p{\sua} z^{\alpha-1}\p{\sub}^{\sua}}{(z^\alpha+\sub)^{\p{\sua}+1}} \\
 \end{align*}
+
+***
+
+## 3a
+
+Let $\nu_i$ be an indicator for whether observation $i$ was right-censored (=1)
+or observed (=0). Let $t_i$ (the time variable in the `tongue` data set) be the
+time of death or censorship for observation $i$. In addition let $x_i$ be
+an indicator for whether observation $i$ belongs to the aneuploid group (=1)
+or the diploid group (=0).
+
+### Weibull Model for Aneuploid Data
+
+> ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/post_a.pdf){ height=70% }
+
+
+blablabla
+
+> ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/post_b.pdf){ height=70% }
+
+## 3b
+
+
+bla
+
+> ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/aft_weib.pdf){ height=70% }
+
+bla
+
+> ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/aft_lognorm.pdf){ height=70% }
+
+> ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/aft_loglog.pdf){ height=70% }
 

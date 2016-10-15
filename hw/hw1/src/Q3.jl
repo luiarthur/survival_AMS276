@@ -83,55 +83,22 @@ R"plotPosts(cbind(lam_d,alp_d),c('lambda','alpha'),legend.pos='right')";
 #################################
 
 #AFT Models
+include("AFT.jl")
+init = AFT.State_weib(1,zeros(2),1,zeros(Int,2))
+const N = length(y_all)
+#m=0;s2=1;a=2;b=3;css=1;csb0=1;csb1=3
+@time aft_out = AFT.aft(y_all, x_all, v_all, init, 
+                        zeros(2), ones(2), [1,3], 
+                        2,3,1,printFreq=10,B=B,burn=burn)
+aft_out[end].sig_acc / B
+aft_out[end].beta_acc / B
+aft_sig = map(o -> o.sig, aft_out)
+aft_b0 = map(o -> o.beta[1], aft_out)
+aft_b1 = map(o -> o.beta[2], aft_out)
 
-immutable State_weib
-  sig::Real
-  b0::Real
-  b1::Real
-  sig_acc::Int
-  b0_acc::Int
-  b1_acc::Int
-end
-
-function update_weib(state::State_weib;m=0,s2=1,a=2,b=3,css=1,csb0=1,csb1=1)
-
-  const sum_y = sum(y_all)
-
-  # log-likelihood
-  function loglike(sig::Real,b0::Real,b1::Real)
-    sum(
-        v_all .* (-log(sig) .+ log(y_all)./sig .+ (b0+b1*x_all)/sig) .- 
-        exp((b0+b1)/sig) .* y_all.^(1/sig)
-       )
-  end
-
-  # log-prior: beta
-  logprior_beta(beta::Real) = -(beta-m)^2 / (2*s2)
-
-  # log-prior: sig
-  logprior_sig(sig::Real) = (-a=1)*log(sig) - b/sig
-
-  # update sig
-  const (new_sig, sig_acc) =
-  mh_normal(state.sig, sig->loglike(sig,state.b0,state.b1)+logprior_sig(sig), 
-            state.sig_acc, css, inbounds=x->x>0)
-
-  # update b0
-  const (new_b0, b0_acc) =
-  mh_normal(state.b0, b0->loglike(new_sig,b0,state.b1)+logprior_beta(b0), 
-            state.b0_acc, csb0)
-
-  # update b1
-  const (new_b1, b1_acc) =
-  mh_normal(state.b1, b1->loglike(new_sig,new_b0,b1)+logprior_beta(b1), 
-            state.b1_acc, csb1)
-
-  return State_weib(new_sig,new_b0,new_b1,sig_acc,b0_acc,b1_acc)
-end
-
-@time out_weib = gibbs(State_weib(1,0,0,0,0,0),update_weib,B,burn);
+@rput aft_sig aft_b0 aft_b1
+R"plotPosts(cbind(aft_sig, aft_b0, aft_b1),legend.pos='right',cex.l=.8,show.x=F)";
 
 #=
 include("Q3.jl")
 =#
-

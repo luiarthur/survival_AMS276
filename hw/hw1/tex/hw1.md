@@ -146,14 +146,19 @@ time of death or censorship for observation $i$. In addition let $x_i$ be
 an indicator for whether observation $i$ belongs to the aneuploid group (=1)
 or the diploid group (=0).
 
+### Prior
+
+### Posterior
+
 > ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/post_a.pdf){ height=70% }
-
-
-blablabla
 
 > ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/post_b.pdf){ height=70% }
 
-**Need to do sensitivity analysis!!!**
+### Conclusions
+
+### Sensitivity Analysis on $\lambda$ and $\alpha$
+
+### Comments on $\alpha$ for Each Group
 
 ## 3b
 
@@ -300,7 +305,9 @@ The conclusion under this model is that the risk for patients with aneuploid
 cells is 0.631 ($=\exp(\hat{\beta_1}/\hat\sigma)$) that of patients with diploid
 cells. That is patients with diploid cells are at higher risk.
 
-## 3d Model Comparison with DIC
+## 3d
+
+### Model Comparison with DIC
 The three AFT models can be compared using deviance information criterion
 (DIC), defined as 
 $$ DIC = \bar{D}(\theta) + \widehat{\text{var}}\p{D(\theta)} / 2 $$
@@ -316,8 +323,8 @@ The following table summarizes the DICs of the three models
 |:-----:|:-------:|:------------:|:----------:|
 |DIC    |  253.977|       253.099| **155.778**|
 
-
-
+Since the log-normal model has the lowest DIC, I conclude that
+the **log-normal AFT model best fits the data**.
 
 [//]: # (
 \beginmyfig

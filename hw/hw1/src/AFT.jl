@@ -3,7 +3,7 @@ module AFT
 using Distributions
 import MCMC
 
-export State_aft, aft
+export State_aft, aft, dic
 
 immutable State_aft
   sig::Real
@@ -93,6 +93,42 @@ function aft(t, X, v, init::State_aft,
 
   return out
 end # aft
+
+function dic(post::Array{State_aft,1}, t, X, v; model="weibull")
+  assert(in(model,["weibull","lognormal","loglogistic"]))
+  assert(size(X,1)==length(t))
+
+  const y = in(model,["loglogistic","lognormal"]) ? log(t) : t
+  const N = length(y)
+  const X1 = [ones(N) X]
+  const J = size(X1,2)
+
+  function loglike(sig::Real,beta::Array{Real,1})
+    if J < 20
+      if J == 2
+        Xb = beta[1] .+ X * beta[2] # 2s
+      else # 2 < J < 20
+        Xb = sum([X1[:,j] * beta[j] for j in 1:J]) # 4s
+      end
+    else # J ≥ 20
+      Xb = X1*beta # 121s
+    end
+
+    if model == "lognormal"
+      lam = (y .+ Xb) / sig
+      sum(v .* -(log(sig) .+ (lam.^2)/2) + 
+          (1 .- v) .* log([1-cdf(Normal(0,1),l) for l in lam]) )
+    elseif model == "loglogistic"
+      lam = (y .+ Xb) / sig
+      sum(v .* (lam .- log(sig) - log(1.+exp(lam))) .- log(1.+exp(lam)))
+    else
+      sum(v .* (-log(sig) .+ log(y)/sig .+ Xb/sig) .- exp(Xb/sig) .* y.^(1/sig))
+    end
+  end
+
+  const D = [-2 * loglike(t.sig,t.beta) for t in post]
+  return mean(D) + var(D) / 2
+end # dic
 
 end # AFT
 

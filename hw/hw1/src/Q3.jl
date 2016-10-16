@@ -1,4 +1,5 @@
 using RCall, MCMC, Distributions
+srand(1234)
 
 R"""
 library(KMsurv)   # To get the datasets in K-M
@@ -93,8 +94,8 @@ const N = length(y_all)
 
 # Weibull
 @time aft_weib = AFT.aft(y_all, x_all, v_all, init, 
-                         zeros(2), ones(2), [1,1], 
-                         2,3,1,printFreq=10,B=B,burn=5000);
+                         zeros(2), [10,10], [1,1], 
+                         2,1,1,printFreq=10,B=B,burn=5000);
 
 aft_weib_sig = map(o -> o.sig, aft_weib)
 aft_weib_b0 = map(o -> o.beta[1], aft_weib)
@@ -107,8 +108,8 @@ R"dev.off()"
 
 # LogLogistic
 @time aft_loglog = AFT.aft(y_all, x_all, v_all, init, 
-                           zeros(2), ones(2), [1,1], 
-                           2,3,1,printFreq=10,B=B,burn=5000,model="loglogistic");
+                           zeros(2), [10,10], [1,1], 
+                           2,1,1,printFreq=10,B=B,burn=5000,model="loglogistic");
 
 aft_loglog_sig = map(o -> o.sig, aft_loglog)
 aft_loglog_b0 = map(o -> o.beta[1], aft_loglog)
@@ -121,8 +122,8 @@ R"dev.off()"
 
 # LogNormal
 @time aft_logNorm = AFT.aft(y_all, x_all, v_all, init, 
-                            zeros(2), ones(2), [1,1], 
-                            2,3,1,printFreq=10,B=B,burn=5000,model="lognormal");
+                            zeros(2), [10,10], [1,1], 
+                            2,1,1,printFreq=10,B=B,burn=5000,model="lognormal");
 
 aft_logNorm_sig = map(o -> o.sig, aft_logNorm)
 aft_logNorm_b0 = map(o -> o.beta[1], aft_logNorm)
@@ -133,9 +134,25 @@ R"pdf('../img/aft_lognorm.pdf')"
 R"plotPosts(cbind(aft_logNorm_sig, aft_logNorm_b0, aft_logNorm_b1),legend.pos='right',cex.l=.8,show.x=F)"; println()
 R"dev.off()"
 
-#=
-include("Q3.jl")
+### Print R models:
+println("Equivalent models in R")
 R"weib_mod <- survreg(Surv(time, delta) ~ as.factor(type), dist='weibull', data=tongue)"
 R"loglogistic_mod <- survreg(Surv(time, delta) ~ as.factor(type), dist='loglogistic', data=tongue)"
 R"lognormal_mod <- survreg(Surv(time, delta) ~ as.factor(type), dist='lognormal', data=tongue)" 
+
+R"print(summary(weib_mod))"
+R"print(summary(loglogistic_mod))"
+R"print(summary(lognormal_mod))"
+
+### DIC:
+weib_dic =    AFT.dic(aft_weib,y_all,x_all,v_all, model="weibull")
+loglog_dic =  AFT.dic(aft_loglog,y_all,x_all,v_all, model="loglogistic")
+lognorm_dic = AFT.dic(aft_logNorm,y_all,x_all,v_all, model="lognormal")
+
+println("DIC for Weibull: ",weib_dic)
+println("DIC for loglog:  ",loglog_dic)
+println("DIC for lognorm: ",lognorm_dic)
+
+#=
+include("Q3.jl")
 =#

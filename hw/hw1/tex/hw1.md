@@ -155,20 +155,35 @@ be $p(\lambda) \propto \lambda^{-1}$ which is non-informative (and improper).
 This also incorporates my prior uncertainty of the value of the parameter.
 
 ### Posterior
+Figures \ref{fig:postweiba} and \ref{fig:postweibd} summarize the posterior
+distributions of the parameters in the Weibull model for the aneuploid tumor
+patients and diploid patients respectively.
 
-\beginmyfig
-\includegraphics[height=.7\textwidth]{../img/post_a.pdf}
-\caption{Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.}
-\label{fig:weiba}
-\endmyfig
+\begin{figure*}
+  \begin{minipage}{.45\linewidth}
+    \centering \includegraphics[height=1\textwidth]{../img/post_a.pdf}
+    \caption{Posterior distributions of ($\lambda,\alpha$) for Aneuploid Tumor Patients}
+    \label{fig:postweiba}
+  \end{minipage}\hfill
+  \begin{minipage}{.45\linewidth}
+    \centering \includegraphics[height=1\textwidth]{../img/post_b.pdf}
+    \caption{Posterior distributions of ($\lambda,\alpha$) for Diploid Tumor Patients}
+    \label{fig:postweibd}
+  \end{minipage}
+\end{figure*}
 
+Figure \ref{fig:and} compares the two groups. The posterior survival
+probabilities (with 95% CI) are plotted. In general, the aneuploid
+group has higher survival probability.
 \beginmyfig
-\includegraphics[height=.7\textwidth]{../img/post_b.pdf}
-\caption{Posterior distribution for $\lambda$ and $\alpha$ for diploid data.}
-\label{fig:weibd}
+\includegraphics[height=.7\textwidth]{../img/and.pdf}
+\caption{survival probability (95\% CI) for aneuploid (blue) and diploid (pink) tumor patients in terms of 10 weeks.}
+\label{fig:and}
 \endmyfig
 
 ### Conclusions
+I would conclude that, on average and for any given time, the aneuploid group
+has a better chance of survival than the diploid group.
 
 ### Sensitivity Analysis on $\lambda$ and $\alpha$
 

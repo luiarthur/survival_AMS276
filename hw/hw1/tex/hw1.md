@@ -16,6 +16,7 @@ fontsize: 12pt
 header-includes: 
     - \usepackage{bm}
     - \usepackage{bbm}
+    - \usepackage{graphicx}
     - \pagestyle{empty}
     - \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
     - \newcommand{\p}[1]{\left(#1\right)}
@@ -147,12 +148,25 @@ an indicator for whether observation $i$ belongs to the aneuploid group (=1)
 or the diploid group (=0).
 
 ### Prior
+The prior distribution for $\alpha$ was $\text{Gamma}(0.1,0.1)$ was reflects
+a prior mean of 1 and variance of 10. This incorporates my prior uncertainty of
+the value of the parameter. The prior distribution for $\lambda$ was chosen to
+be $p(\lambda) \propto \lambda^{-1}$ which is non-informative (and improper).
+This also incorporates my prior uncertainty of the value of the parameter.
 
 ### Posterior
 
-> ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/post_a.pdf){ height=70% }
+\beginmyfig
+\includegraphics[height=.7\textwidth]{../img/post_a.pdf}
+\caption{Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.}
+\label{fig:weiba}
+\endmyfig
 
-> ![Posterior distribution for $\lambda$ and $\alpha$ for aneuploid data.](../img/post_b.pdf){ height=70% }
+\beginmyfig
+\includegraphics[height=.7\textwidth]{../img/post_b.pdf}
+\caption{Posterior distribution for $\lambda$ and $\alpha$ for diploid data.}
+\label{fig:weibd}
+\endmyfig
 
 ### Conclusions
 
@@ -215,21 +229,26 @@ computed jointly. But by writing out the full conditionals for each parameter,
 a Gibbs sampler with 3 separate Metropolis steps can be implemented to obtain
 samples from the posterior distribution.
 
-Figure 3 summarizes the posterior distributions of all parameters in the
-Weibull AFT model. The diagonals display the univariate posterior distributions
-of $\sigma$, $\beta_0$, and $\beta_1$. 
+Figure \ref{fig:weibaft} summarizes the posterior distributions of all parameters
+in the Weibull AFT model. The diagonals display the univariate posterior
+distributions of $\sigma$, $\beta_0$, and $\beta_1$. 
 
-> ![Posterior distribution for $\sigma$ and $\beta$ for Weibull AFT model.](../img/aft_weib.pdf){ height=70% }
+\beginmyfig
+\includegraphics[height=0.7\textwidth]{../img/aft_weib.pdf}
+\caption{Posterior distributions for $\sigma$ and $\beta$}
+\label{fig:weibaft}
+\endmyfig
 
 Note that within each plot, the trace plots are included and seem to indicate
 that the Gibbs sampler has converged. Note also that the posterior mean has
 been outlined in red, the standard deviation written, and a 95% equal-tailed
-credible interval (CI) were included. The upper subplots of Figure 3 display
-the bivariate distribution and trace plots. Again, the trace plots seem to
-indicate that the chain has converged. Finally, in the lower subplots, the
-correlations between each pair of parameters were included. $\beta_0$ and
-$\beta_1$ are more-than-moderately negatively correlated (-.765). This is
-expected as when the intercept increases, the relative slopes should decrease.
+credible interval (CI) were included. The upper subplots of Figure
+\ref{fig:weibaft} display the bivariate distribution and trace plots. Again,
+the trace plots seem to indicate that the chain has converged. Finally, in the
+lower subplots, the correlations between each pair of parameters were included.
+$\beta_0$ and $\beta_1$ are more-than-moderately negatively correlated (-.765).
+This is expected as when the intercept increases, the relative slopes should
+decrease.
 
 To briefly summarize in words, $\sigma$ has a posterior mean of 1.272, standard
 deviation of 0.15, and 95% CI of (1.026, 1.602). $\beta_0$ has a posterior
@@ -238,32 +257,19 @@ $\beta_1$ has a posterior mean of -0.669, standard deviation of 0.369, and 95%
 CI of (-1.421, 0.07).
 
 ### Interpretation of Weibull AFT Coefficients
-Recall that the relationship between the covariates and the data is
-$$
-\begin{split}
-Y_i = \log T_i &= -\beta_0 -x_i\beta_1 + \sigma W_i \\
-T_i | \beta_0, \beta_1, \sigma &\sim Weibull\p{\frac{1}{\sigma},\frac{\beta_0+x_i\beta_1}{\sigma}} \\
-\end{split}
-$$
-Recall also that the hazard function of the Weibull distribution is
-$$
-\begin{split}
-h_T(t|\alpha,\lambda) &=\alpha e^\lambda t^{\alpha-1} \\
-\Rightarrow  h_T\p{t\given\frac{1}{\sigma},\frac{\beta_0+x\beta_1}{\sigma}} &=\frac{1}{\sigma} \exp\p{\frac{\beta_0+x\beta_1}{\sigma}}t^{\frac{1}{\sigma}-1} \\
-\Rightarrow  \frac{h(t|x=1)}{h(t|x=0)} = \frac{h(t~|\text{ anueploid})}{h(t~|\text{ diploid})} &= \exp\p{\frac{\beta_1}{\sigma}}
-\end{split}
-$$
-A point estimate of $\exp\p{\ds\frac{\beta_1}{\sigma}}$ can be obtained by 
-substituting the posterior means for $\beta_1$ and $\sigma$, yielding
-$\exp\p{\ds\frac{\beta_1}{\sigma}} = \exp\p{\ds\frac{-0.699}{1.272}} = 0.577$.
-We can say that the relative risk of death (ratio of hazards) for
-a patient with aneuploid cells compared to one with diploid cells is 
-$0.577$. Or the risk of patients with aneuploid cells is lower than patients
-with diploid cells.
+The posterior distribution of $\exp(\beta_1)$ was computed using the posterior
+samples and is shown in Figure \ref{fig:weibaf}.
 
-We can also say that on average, the log survival time of a patient with
-diploid cells is 2.031 (=$-\E\bk{\beta_0|y,X}$), and that of a patient with
-aneuploid cells is 6.099 (=$-\E\bk{\beta_1|y,X}$) higher.
+\beginmyfig
+\includegraphics[height=0.7\textwidth]{../img/weibaf.pdf}
+\caption{Posterior Acceleration Factor (Weibull Model)}
+\label{fig:weibaf}
+\endmyfig
+
+From this, we can say that on average, the acceleration factor of aneuploid
+tumor patients compared to diploid tumor patients is 0.548. That is, the median
+lifetime of a *diploid* tumor patient is estimated to be 0.548 that of an
+aneuploid tumor patient's. That is diploid tumor patients are at higher risk.
 
 ## 3c
 
@@ -274,17 +280,32 @@ interpretation of the parameters remain mostly unchanged.
 
 ### Posterior Distribution of Parameters in Log-logistic AFT Model
 The posterior distribution of parameters in the log-logistic AFT model are 
-shown in Figure 4.
+shown in Figure \ref{fig:loglogaft}.
 
-> ![Posterior distribution for $\sigma$ and $\beta$ for log-logistic AFT model.](../img/aft_loglog.pdf){ height=70% }
+\beginmyfig
+\includegraphics[height=0.7\textwidth]{../img/aft_loglog.pdf}
+\caption{Posterior distribution for $\sigma$ and $\beta$ for log-logistic AFT model.}
+\label{fig:loglogaft}
+\endmyfig
 
 To summarize heuristically, the posterior mean for $\sigma$ is $0.987$, with 
 standard deviation 0.117. The posterior means for $(\beta_0,\beta_1)$ are
 (-1.372,-0.807) with standard deviations (0.327, 0.413). 
 
-The conclusion under this model is that the risk for patients with aneuploid
-cells is 0.441 ($=\exp(\hat{\beta_1}/\hat\sigma)$) that of patients with diploid
-cells. That is patients with diploid cells are at higher risk.
+The posterior distribution of $\exp(\beta_1)$ was computed using the posterior
+samples and is shown in Figure \ref{fig:loglogaf}.
+
+\beginmyfig
+\includegraphics[height=0.7\textwidth]{../img/loglogaf.pdf}
+\caption{Posterior Acceleration Factor (Log-logistic Model)}
+\label{fig:loglogaf}
+\endmyfig
+
+We can conclude that on average, the acceleration factor of aneuploid
+tumor patients compared to diploid tumor patients is 0.486. That is, the median
+lifetime of a *diploid* tumor patient is estimated to be 0.486 that of an
+aneuploid tumor patient's. That is diploid tumor patients are at higher risk.
+
 
 ### Prior Specification for Parameters in Log-normal AFT Model
 Again, the prior distributions chosen for parameters in the log-normal AFT model
@@ -293,17 +314,31 @@ interpretation of the parameters remain mostly unchanged.
 
 ### Posterior Distribution of Parameters in Log-normal AFT Model
 The posterior distribution of parameters in the log-normal AFT model are 
-shown in Figure 5.
+shown in Figure \ref{fig:lognormaft}.
 
-> ![Posterior distribution for $\sigma$ and $\beta$ for log-normal AFT model.](../img/aft_lognorm.pdf){ height=70% }
+\beginmyfig
+\includegraphics[height=0.7\textwidth]{../img/aft_lognorm.pdf}
+\caption{Posterior distribution for $\sigma$ and $\beta$ for log-normal AFT model.}
+\label{fig:lognormaft}
+\endmyfig
 
 To summarize heuristically, the posterior mean for $\sigma$ is $1.721$, with 
 standard deviation 0.187. The posterior means for $(\beta_0,\beta_1)$ are
 (-1.36,-0.791) with standard deviations (0.332, 0.412). 
 
-The conclusion under this model is that the risk for patients with aneuploid
-cells is 0.631 ($=\exp(\hat{\beta_1}/\hat\sigma)$) that of patients with diploid
-cells. That is patients with diploid cells are at higher risk.
+The posterior distribution of $\exp(\beta_1)$ was computed using the posterior
+samples and is shown in Figure \ref{fig:lognormaf}.
+
+\beginmyfig
+\includegraphics[height=0.7\textwidth]{../img/lognormaf.pdf}
+\caption{Posterior Acceleration Factor (Log-normal Model)}
+\label{fig:lognormaf}
+\endmyfig
+
+We can conclude that on average, the acceleration factor of aneuploid
+tumor patients compared to diploid tumor patients is 0.493. That is, the median
+lifetime of a *diploid* tumor patient is estimated to be 0.493 that of an
+aneuploid tumor patient's. That is diploid tumor patients are at higher risk.
 
 ## 3d
 
@@ -326,10 +361,19 @@ The following table summarizes the DICs of the three models
 Since the log-normal model has the lowest DIC, I conclude that
 the **log-normal AFT model best fits the data**.
 
-[//]: # (
+---
+
+
+[//]: # ( example image embedding
 \beginmyfig
-\includegraphics[height=0.5\textwidth]{../img/aft_weib.pdf}
+\includegraphics[height=0.5\textwidth]{path/to/img/img.pdf}
+\caption{some caption}
+\label{fig:mylabel}
+% reference by: \ref{fig:mylabel}
 \endmyfig
+)
+[//]: # ( example image embedding
+> ![some caption.\label{mylabel}](path/to/img/img.pdf){ height=70% }
 )
 
 

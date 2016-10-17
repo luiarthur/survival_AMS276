@@ -1,5 +1,5 @@
 using RCall, MCMC, Distributions
-srand(1234)
+srand(256)
 
 R"""
 library(KMsurv)   # To get the datasets in K-M
@@ -38,7 +38,7 @@ immutable State
   alpha_acc::Int
 end
                            # Priors:
-function update_gen(y,v,cs;a_alpha=2,b_alpha=1,a_lam=0,b_lam=0)
+function update_gen(y,v,cs;a_alpha=.1,b_alpha=.1,a_lam=0,b_lam=0)
   const sum_v = sum(v)
 
   function update(state::State)
@@ -64,8 +64,8 @@ end
 const B = 10000
 const burn = 1000
 
-update_a = update_gen(y_a,v_a,.3;a_alpha=2,b_alpha=1,a_lam=0,b_lam=0)
-update_d = update_gen(y_d,v_d,.3;a_alpha=2,b_alpha=1,a_lam=0,b_lam=0)
+update_a = update_gen(y_a,v_a,.3;a_alpha=.1,b_alpha=.1,a_lam=0,b_lam=0)
+update_d = update_gen(y_d,v_d,.3;a_alpha=.1,b_alpha=.1,a_lam=0,b_lam=0)
 @time out_a = gibbs(State(1,1,0),update_a,B,burn);
 @time out_d = gibbs(State(1,1,0),update_d,B,burn);
 
@@ -86,7 +86,7 @@ R"plotPosts(cbind(lam_d,alp_d),c('lambda','alpha'),legend.pos='right')";
 R"dev.off()"
 
 #################################
-
+srand(256)
 #AFT Models
 include("AFT.jl")
 init = AFT.State_aft(1,zeros(2),1,zeros(Int,2))
@@ -152,6 +152,29 @@ lognorm_dic = AFT.dic(aft_logNorm,y_all,x_all,v_all, model="lognormal")
 println("DIC for Weibull: ",weib_dic)
 println("DIC for loglog:  ",loglog_dic)
 println("DIC for lognorm: ",lognorm_dic)
+
+### Posterior Acceleration (to death) Factor:
+println()
+weibAF = map(o -> exp(o.beta[2]), aft_weib)
+println("Weibull Acceleration Factor (for aneploid compared to diploid): ",mean(weibAF))
+@rput weibAF
+R"pdf('../img/weibaf.pdf')"
+R"plotPost(weibAF,main='',legend.pos='right',cex.l=1.5)"
+R"dev.off()"
+
+loglogAF = map(o -> exp(o.beta[2]), aft_loglog)
+println("Loglog Acceleration Factor (for aneploid compared to diploid): ",mean(loglogAF))
+@rput loglogAF
+R"pdf('../img/loglogaf.pdf')"
+R"plotPost(loglogAF,main='',legend.pos='right',cex.l=1.5)"
+R"dev.off()"
+
+lognormAF = map(o -> exp(o.beta[2]), aft_logNorm)
+println("LogNorm Acceleration Factor (for aneploid compared to diploid): ",mean(lognormAF))
+@rput lognormAF
+R"pdf('../img/lognormaf.pdf')"
+R"plotPost(lognormAF,main='',legend.pos='right',cex.l=1.5)"
+R"dev.off()"
 
 #=
 include("Q3.jl")

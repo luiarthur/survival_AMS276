@@ -1,4 +1,3 @@
-#!/home/arthur/programs/julia-0.5.0/bin/julia
 using RCall, MCMC, Distributions
 srand(256)
 

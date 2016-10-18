@@ -188,13 +188,29 @@ has a better chance of survival than the diploid group.
 ### Sensitivity Analysis on $\lambda$ and $\alpha$
 Figure \ref{fig:sensa} shows how the posterior means of $\alpha$ and
 $\lambda$ vary as the prior parameters for $\alpha$ change.
-$\lambda$ stays relatively stable. However, $\alpha$ seems
-to 
+Note that here, the prior for $\lambda$ is kept as
+$p(\lambda) \propto \lambda^{-1}$.
+$\lambda$ stays relatively stable. The range of posterior means are between 0.09 and 0.14, which is not overwhelmingly large. However, $\alpha$ seems to vary much, as it ranges from 0.75 to 0.95. In addition, note that when the prior mean $\p{\ds\frac{\alpha_{\text{shape}}}{\alpha_{\text{rate}}}}$
+is low, the posterior mean is low; likewise, when the prior mean
+is high, the posterior mean is also high. This is expected, but
+the effects are quite large. So, I would conclude that $\alpha$ is at least moderately sensitive to the prior distribution
+specified.
 \beginmyfig
 \includegraphics[height=.4\textwidth]{../img/sensa.pdf}
 \caption{}
 \label{fig:sensa}
 \endmyfig
+Figure \ref{fig:sensl} shows how the posterior means of $\alpha$ and $\lambda$
+vary as the prior parameters for $\lambda$ change. Note that here, the prior
+for $\alpha$ is kept as $p(\alpha) \sim Gamma(1/10,1/10)$. Once again,
+$\lambda$ stays relatively stable. The range of posterior means are between
+0.10 and 0.18. However, $\alpha$ varies from 0.65 to 0.90. In addition, note
+that when the prior mean for $\lambda$
+$\p{\ds\frac{\lambda_{\text{rate}}}{\lambda_{\text{shape}}-1}}$ is low, the
+posterior mean for $\alpha$ is low; likewise, when the prior mean for $\lambda$
+is high, the posterior mean for $\alpha$ is also high. I would conclude that
+$\alpha$ is at least sensitive to the prior distribution specified for
+$\lambda$.
 
 \beginmyfig
 \includegraphics[height=.4\textwidth]{../img/sensl.pdf}
@@ -202,6 +218,11 @@ to
 \label{fig:sensl}
 \endmyfig
 
+To conclude, just from viewing figures \ref{fig:sensa} and \ref{fig:sensl},
+I would say that $\lambda$ is relatively more robust to prior specifications.
+But $\alpha$ is sensitive to prior specifications for both $\alpha$ and
+$\lambda$. Perhaps an improper prior or very well-elicited prior distributions
+should be preferred.
 
 
 ### Comments on $\alpha$ for Each Group
@@ -261,7 +282,7 @@ to be
 $$
 \begin{split}
 \sigma &\sim \text{Inverse-Gamma}(2,1) \\
-\beta &\sim \text{Normal}(0,3I_2) \\
+\beta &\sim \text{Normal}(0,10I_2) \\
 \end{split}
 $$
 
@@ -303,10 +324,10 @@ This is expected as when the intercept increases, the relative slopes should
 decrease.
 
 To briefly summarize in words, $\sigma$ has a posterior mean of 1.272, standard
-deviation of 0.15, and 95% CI of (1.026, 1.602). $\beta_0$ has a posterior
-mean of -2.031, standard deviation of 0.282, and 95% CI of (-2.604, -1.497).
-$\beta_1$ has a posterior mean of -0.669, standard deviation of 0.369, and 95%
-CI of (-1.421, 0.07).
+deviation of 0.15, and 95% CI of (1.02, 1.60). $\beta_0$ has a posterior
+mean of -2.01, standard deviation of 0.282, and 95% CI of (-2.60, -1.49).
+$\beta_1$ has a posterior mean of -0.68, standard deviation of 0.369, and 95%
+CI of (-1.40, 0.026).
 
 ### Interpretation of Weibull AFT Coefficients
 The posterior distribution of $\exp(\beta_1)$ was computed using the posterior
@@ -319,8 +340,8 @@ samples and is shown in Figure \ref{fig:weibaf}.
 \endmyfig
 
 From this, we can say that on average, the acceleration factor of aneuploid
-tumor patients compared to diploid tumor patients is 0.548. That is, the median
-lifetime of a *diploid* tumor patient is estimated to be 0.548 that of an
+tumor patients compared to diploid tumor patients is 0.54. That is, the median
+lifetime of a *diploid* tumor patient is estimated to be 0.54 that of an
 aneuploid tumor patient's. That is diploid tumor patients are at higher risk.
 
 ## 3c
@@ -340,9 +361,9 @@ shown in Figure \ref{fig:loglogaft}.
 \label{fig:loglogaft}
 \endmyfig
 
-To summarize heuristically, the posterior mean for $\sigma$ is $0.987$, with 
+To summarize heuristically, the posterior mean for $\sigma$ is $0.99$, with 
 standard deviation 0.117. The posterior means for $(\beta_0,\beta_1)$ are
-(-1.372,-0.807) with standard deviations (0.327, 0.413). 
+(-1.37,-0.81) with standard deviations (0.35, 0.44). 
 
 The posterior distribution of $\exp(\beta_1)$ was computed using the posterior
 samples and is shown in Figure \ref{fig:loglogaf}.
@@ -354,8 +375,8 @@ samples and is shown in Figure \ref{fig:loglogaf}.
 \endmyfig
 
 We can conclude that on average, the acceleration factor of aneuploid
-tumor patients compared to diploid tumor patients is 0.486. That is, the median
-lifetime of a *diploid* tumor patient is estimated to be 0.486 that of an
+tumor patients compared to diploid tumor patients is 0.49. That is, the median
+lifetime of a *diploid* tumor patient is estimated to be 0.49 that of an
 aneuploid tumor patient's. That is diploid tumor patients are at higher risk.
 
 
@@ -374,9 +395,9 @@ shown in Figure \ref{fig:lognormaft}.
 \label{fig:lognormaft}
 \endmyfig
 
-To summarize heuristically, the posterior mean for $\sigma$ is $1.721$, with 
-standard deviation 0.187. The posterior means for $(\beta_0,\beta_1)$ are
-(-1.36,-0.791) with standard deviations (0.332, 0.412). 
+To summarize heuristically, the posterior mean for $\sigma$ is $1.72$, with 
+standard deviation 0.17. The posterior means for $(\beta_0,\beta_1)$ are
+(-1.31,-0.86) with standard deviations (0.328, 0.40). 
 
 The posterior distribution of $\exp(\beta_1)$ was computed using the posterior
 samples and is shown in Figure \ref{fig:lognormaf}.
@@ -388,8 +409,8 @@ samples and is shown in Figure \ref{fig:lognormaf}.
 \endmyfig
 
 We can conclude that on average, the acceleration factor of aneuploid
-tumor patients compared to diploid tumor patients is 0.493. That is, the median
-lifetime of a *diploid* tumor patient is estimated to be 0.493 that of an
+tumor patients compared to diploid tumor patients is 0.46. That is, the median
+lifetime of a *diploid* tumor patient is estimated to be 0.46 that of an
 aneuploid tumor patient's. That is diploid tumor patients are at higher risk.
 
 ## 3d

@@ -371,10 +371,10 @@ The following table summarizes the DICs of the three models
 
 | Model | Weibull | Log-Logistic | Log-Normal |
 |:-----:|:-------:|:------------:|:----------:|
-|DIC    |  253.977|       253.099| **155.778**|
+|DIC    |  253.977|       253.099| 252.625    |
 
-Since the log-normal model has the lowest DIC, I conclude that
-the **log-normal AFT model best fits the data**.
+The DICs for each model are about the 253, so I would 
+conclude the three models fit the data equally well.
 
 ---
 

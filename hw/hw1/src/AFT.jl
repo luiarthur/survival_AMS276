@@ -116,7 +116,7 @@ function dic(post::Array{State_aft,1}, t, X, v; model="weibull")
 
     if model == "lognormal"
       lam = (y .+ Xb) / sig
-      sum(v .* -(log(sig) .+ (lam.^2)/2) + 
+      sum(v .* -(.5*log(2*pi*sig^2) .+ (lam.^2)/2) + 
           (1 .- v) .* log([1-cdf(Normal(0,1),l) for l in lam]) )
     elseif model == "loglogistic"
       lam = (y .+ Xb) / sig

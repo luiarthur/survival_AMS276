@@ -186,8 +186,45 @@ I would conclude that, on average and for any given time, the aneuploid group
 has a better chance of survival than the diploid group.
 
 ### Sensitivity Analysis on $\lambda$ and $\alpha$
+Figure \ref{fig:sensa} shows how the posterior means of $\alpha$ and
+$\lambda$ vary as the prior parameters for $\alpha$ change.
+$\lambda$ stays relatively stable. However, $\alpha$ seems
+to 
+\beginmyfig
+\includegraphics[height=.4\textwidth]{../img/sensa.pdf}
+\caption{}
+\label{fig:sensa}
+\endmyfig
+
+\beginmyfig
+\includegraphics[height=.4\textwidth]{../img/sensl.pdf}
+\caption{}
+\label{fig:sensl}
+\endmyfig
+
+
 
 ### Comments on $\alpha$ for Each Group
+Figures \ref{fig:compalpha} show the posterior distributions of $\alpha$ for the anueploid tumor group (blue) and the diploid
+group (pink) overlapped. The distributions look quite similar.
+Figure \ref{fig:alphadiff} shows the posterior difference of 
+the $\alpha$ for the two different groups. The distribution is centered near 0, and the 95% credible interval (equal-tailed)
+includes 0.
+
+\begin{figure*}
+  \begin{minipage}{.45\linewidth}
+    \centering \includegraphics[height=1\textwidth]{../img/compareAlpha.pdf}
+    \caption{Posterior distributions of $\alpha$ for aneuploid (blue) and diploid (pink) tumor patients.}
+    \label{fig:compalpha}
+  \end{minipage}\hfill
+  \begin{minipage}{.45\linewidth}
+    \centering \includegraphics[height=1\textwidth]{../img/alphadiff.pdf}
+    \caption{Posterior distribution of the difference in $\alpha$ (aneuploid-diploid). The distribution is centered close to 0, 
+and the 95\% CI contains 0.}
+    \label{fig:alphadiff}
+  \end{minipage}
+\end{figure*}
+
 
 ## 3b
 
@@ -389,6 +426,21 @@ conclude the three models fit the data equally well.
 )
 [//]: # ( example image embedding
 > ![some caption.\label{mylabel}](path/to/img/img.pdf){ height=70% }
+)
+
+[//]: # ( example two figs side-by-side
+\begin{figure*}
+  \begin{minipage}{.45\linewidth}
+    \centering \includegraphics[height=1\textwidth]{img1.pdf}
+    \caption{some caption}
+    \label{fig:myLabel1}
+  \end{minipage}\hfill
+  \begin{minipage}{.45\linewidth}
+    \centering \includegraphics[height=1\textwidth]{img2.pdf}
+    \caption{some caption}
+    \label{fig:myLabel2}
+  \end{minipage}
+\end{figure*}
 )
 
 

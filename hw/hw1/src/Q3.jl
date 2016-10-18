@@ -3,6 +3,7 @@ using RCall, MCMC, Distributions
 srand(256)
 
 R"""
+library(fields)
 library(KMsurv)   # To get the datasets in K-M
 library(survival) # R functions
 library(rcommon)  # devtools::install_github('luiarthur/rcommon')
@@ -104,10 +105,65 @@ R"legend('topright',legend=c('Aneuploid','Diploid'),text.col=c('dodgerblue','pin
 R"dev.off()"
 
 # Compare alpha
-R"plotPost(alp_a,float=TRUE)"
-R"plotPost(alp_d)"
-R"plotPost(alp_a-alp_d,float=TRUE)"
-R"abline(v=0)"
+R"pdf('../img/compareAlpha.pdf')"
+R"color.den(density(alp_a),from=0,to=1.3,col.area=rgb(0,0,1,.4),add=F,fg='grey',bty='n',main='')"
+R"color.den(density(alp_d),from=0,to=1.3,col.area=rgb(1,0,0,.4),add=T,col.den=rgb(0,0,0,0))"
+R"legend('topright',legend=c('Aneuploid','Diploid'),text.col=c('dodgerblue','pink'),text.font=2,bty='n',cex=2.6)"
+R"dev.off()"
+
+R"pdf('../img/alphadiff.pdf')"
+R"plotPost(alp_a-alp_d,main=expression(alpha[diff]),cex.main=3,cex.l=2,cex.a=2)"
+R"dev.off()"
+
+# Sensitivity on λ and α
+function sensitivity(a_alpha,b_alpha,a_lam,b_lam; cs=.3)
+  update = update_gen(y_a,v_a,cs;a_alpha=a_alpha,b_alpha=b_alpha,a_lam=a_lam,b_lam=b_lam)
+  out_sens = gibbs(State(1,1,0),update,500,1000);
+  lam_sens = map(o -> o.lambda, out_sens)
+  alp_sens = map(o->o.alpha, out_sens)
+  Dict(
+       :a=>Dict(:mean=>mean(alp_sens),:ci=>quantile(alp_sens,[.025,.975])),
+       :l=>Dict(:mean=>mean(lam_sens),:ci=>quantile(lam_sens,[.025,.975])),
+      )
+end
+
+# for lambda improper
+n = 1000
+U = rand(Uniform(0,5),(n,2))
+@time tmp=sensitivity(.1,.1,0,0);
+sens_a = Array{typeof(tmp),1}(n)
+sens_l = Array{typeof(tmp),1}(n)
+
+# 90s on 4core, o.w. double on 1 thread
+@time Threads.@threads for i in 1:n
+  sens_a[i] = sensitivity(U[i,1],U[i,2],0,0)
+  sens_l[i] = sensitivity(.1,.1,U[i,1],U[i,2])
+end
+
+function plotSens(sens,param="a")
+  a_means = map(o -> o[:a][:mean],sens)
+  l_means = map(o -> o[:l][:mean],sens)
+  @rput U a_means l_means param
+  R"""
+  par(mfrow=c(1,2))
+  par(mar=c(4,8,1,5))
+  xlab=ifelse(param=="a",expression(alpha[shape]),expression(lambda[shape]))
+  ylab=ifelse(param=="a",expression(alpha[rate]),expression(lambda[rate]))
+  quilt.plot(U[,1],U[,2],a_means,xlab=xlab,ylab=ylab,cex.main=2,
+             fg='grey',bty='n',cex.lab=2,
+             main=expression(alpha))
+  quilt.plot(U[,1],U[,2],l_means,xlab=xlab,cex.main=2,
+             fg='grey',bty='n',cex.lab=2,
+             main=expression(lambda))
+  par(mfrow=c(1,1),las=0)
+  """
+end
+R"pdf('../img/sensa.pdf',w=10,h=5)"
+plotSens(sens_a,"a")
+R"dev.off()"
+R"pdf('../img/sensl.pdf',w=10,h=5)"
+plotSens(sens_l,"l")
+R"dev.off()"
 
 #################################
 srand(256)

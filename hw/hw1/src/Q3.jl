@@ -80,10 +80,10 @@ acc_d = out_d[end].alpha_acc / length(out_d)
 
 @rput lam_a alp_a lam_d alp_d;
 R"pdf('../img/post_a.pdf')"
-R"plotPosts(cbind(lam_a,alp_a),c('lambda','alpha'),legend.pos='right',cex.l=1.3)";
+R"plotPosts(cbind(lam_a,alp_a),c('lambda','alpha'),legend.pos='right',cex.l=1.3,show.x=F,cex.a=2)";
 R"dev.off()"
 R"pdf('../img/post_b.pdf')"
-R"plotPosts(cbind(lam_d,alp_d),c('lambda','alpha'),legend.pos='right',cex.l=1.3)";
+R"plotPosts(cbind(lam_d,alp_d),c('lambda','alpha'),legend.pos='right',cex.l=1.3,show.x=F,cex.a=2)";
 R"dev.off()"
 
 # Compare
@@ -103,6 +103,12 @@ R"color.btwn(yseq,sapply(Sd,quantile,.025),sapply(Sd,quantile,.975),from=0,to=50
 R"legend('topright',legend=c('Aneuploid','Diploid'),text.col=c('dodgerblue','pink'),text.font=2,bty='n',cex=3)"
 R"dev.off()"
 
+# Compare alpha
+R"plotPost(alp_a,float=TRUE)"
+R"plotPost(alp_d)"
+R"plotPost(alp_a-alp_d,float=TRUE)"
+R"abline(v=0)"
+
 #################################
 srand(256)
 #AFT Models
@@ -121,7 +127,7 @@ aft_weib_b1 = map(o -> o.beta[2], aft_weib)
 
 @rput aft_weib_sig aft_weib_b0 aft_weib_b1
 R"pdf('../img/aft_weib.pdf')"
-R"plotPosts(cbind(aft_weib_sig, aft_weib_b0, aft_weib_b1),legend.pos='right',cex.l=1,show.x=F)"; println()
+R"plotPosts(cbind(aft_weib_sig, aft_weib_b0, aft_weib_b1),legend.pos='right',cex.l=1,show.x=F,cex.a=1.5)"; println()
 R"dev.off()"
 
 # LogLogistic
@@ -135,7 +141,7 @@ aft_loglog_b1 = map(o -> o.beta[2], aft_loglog)
 
 @rput aft_loglog_sig aft_loglog_b0 aft_loglog_b1
 R"pdf('../img/aft_loglog.pdf')"
-R"plotPosts(cbind(aft_loglog_sig, aft_loglog_b0, aft_loglog_b1),legend.pos='right',cex.l=1,show.x=F)"; println()
+R"plotPosts(cbind(aft_loglog_sig, aft_loglog_b0, aft_loglog_b1),legend.pos='right',cex.l=1,show.x=F,cex.a=1.5)"; println()
 R"dev.off()"
 
 # LogNormal
@@ -149,7 +155,7 @@ aft_logNorm_b1 = map(o -> o.beta[2], aft_logNorm)
 
 @rput aft_logNorm_sig aft_logNorm_b0 aft_logNorm_b1
 R"pdf('../img/aft_lognorm.pdf')"
-R"plotPosts(cbind(aft_logNorm_sig, aft_logNorm_b0, aft_logNorm_b1),legend.pos='right',cex.l=1,show.x=F)"; println()
+R"plotPosts(cbind(aft_logNorm_sig, aft_logNorm_b0, aft_logNorm_b1),legend.pos='right',cex.l=1,show.x=F,cex.a=1.5)"; println()
 R"dev.off()"
 
 ### Print R models:

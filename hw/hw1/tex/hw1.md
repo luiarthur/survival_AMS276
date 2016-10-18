@@ -371,7 +371,7 @@ The following table summarizes the DICs of the three models
 
 | Model | Weibull | Log-Logistic | Log-Normal |
 |:-----:|:-------:|:------------:|:----------:|
-|DIC    |  253.977|       253.099| 252.625    |
+|DIC    | 253.643 |      253.588 |    252.625 |
 
 The DICs for each model are about the 253, so I would 
 conclude the three models fit the data equally well.

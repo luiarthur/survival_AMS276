@@ -170,11 +170,14 @@ srand(256)
 include("AFT.jl")
 init = AFT.State_aft(1,zeros(2),1,zeros(Int,2))
 const N = length(y_all)
+y = collect(y_all)
+X = collect(x_all')'
+v = collect(v_all * 1.0)
 
 # Weibull
-@time aft_weib = AFT.aft(y_all, x_all, v_all, init, 
-                         zeros(2), [10,10], [1,1], 
-                         2,1,1,printFreq=10,B=B,burn=5000);
+@time aft_weib = AFT.aft(y, X, v, init, 
+                         zeros(Float64,2), [10.0,10.0], [1.0,1.0], 
+                         2.0,1.0,1.0,printFreq=10,B=B,burn=5000);
 
 aft_weib_sig = map(o -> o.sig, aft_weib)
 aft_weib_b0 = map(o -> o.beta[1], aft_weib)
@@ -186,9 +189,10 @@ R"plotPosts(cbind(aft_weib_sig, aft_weib_b0, aft_weib_b1),legend.pos='right',cex
 R"dev.off()"
 
 # LogLogistic
-@time aft_loglog = AFT.aft(y_all, x_all, v_all, init, 
-                           zeros(2), [10,10], [1,1], 
-                           2,1,1,printFreq=10,B=B,burn=5000,model="loglogistic");
+@time aft_loglog = AFT.aft(y, X, v, init, 
+                           zeros(Float64,2), [10.0,10.0], [1.0,1.0], 
+                           2.0,1.0,1.0,printFreq=10,B=B,burn=5000,
+                           model="loglogistic");
 
 aft_loglog_sig = map(o -> o.sig, aft_loglog)
 aft_loglog_b0 = map(o -> o.beta[1], aft_loglog)
@@ -200,9 +204,10 @@ R"plotPosts(cbind(aft_loglog_sig, aft_loglog_b0, aft_loglog_b1),legend.pos='righ
 R"dev.off()"
 
 # LogNormal
-@time aft_logNorm = AFT.aft(y_all, x_all, v_all, init, 
-                            zeros(2), [10,10], [1,1], 
-                            2,1,1,printFreq=10,B=B,burn=5000,model="lognormal");
+@time aft_logNorm = AFT.aft(y, X, v, init, 
+                            zeros(Float64,2), [10.0,10.0], [1.0,1.0], 
+                            2.0,1.0,1.0,printFreq=10,B=B,burn=5000,
+                            model="lognormal");
 
 aft_logNorm_sig = map(o -> o.sig, aft_logNorm)
 aft_logNorm_b0 = map(o -> o.beta[1], aft_logNorm)
@@ -224,9 +229,9 @@ R"print(summary(loglogistic_mod))"
 R"print(summary(lognormal_mod))"
 
 ### DIC:
-weib_dic =    AFT.dic(aft_weib,y_all,x_all,v_all, model="weibull")
-loglog_dic =  AFT.dic(aft_loglog,y_all,x_all,v_all, model="loglogistic")
-lognorm_dic = AFT.dic(aft_logNorm,y_all,x_all,v_all, model="lognormal")
+weib_dic =    AFT.dic(aft_weib,y,X,v, model="weibull")
+loglog_dic =  AFT.dic(aft_loglog,y,X,v, model="loglogistic")
+lognorm_dic = AFT.dic(aft_logNorm,y,X,v, model="lognormal")
 
 println("DIC for Weibull: ",weib_dic)
 println("DIC for loglog:  ",loglog_dic)

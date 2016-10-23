@@ -1,4 +1,9 @@
 module AFT
+#=
+To do:
+  - Clean up code. 
+  - Define all types in functino arguments
+=#
 
 using Distributions
 import MCMC
@@ -6,13 +11,14 @@ import MCMC
 export State_aft, aft, dic
 
 immutable State_aft
-  sig::Real
-  beta::Array{Real,1}
+  sig::Float64
+  beta::Array{Float64,1}
   sig_acc::Int
   beta_acc::Array{Int,1}
 end
 
-function aft(t, X, v, init::State_aft, 
+function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1}, 
+             init::State_aft, 
              m, s2, csb, # priors for β
              a, b, css; # priors for σ
              model="weibull",
@@ -27,28 +33,17 @@ function aft(t, X, v, init::State_aft,
   const X1 = [ones(N) X]
   const J = size(X1,2)
 
-  logprior_beta(bj::Real,mj::Real, s2j::Real) = -(bj-mj)^2 / (2*s2j)
-  logprior_sig(sig::Real) = (-a-1)*log(sig) - b/sig
+  logprior_beta(bj::Float64,mj::Float64, s2j::Float64) = -(bj-mj)^2 / (2*s2j)
+  logprior_sig(sig::Float64) = (-a-1)*log(sig) - b/sig
 
-  function loglike(sig::Real,beta::Array{Real,1};bj=0,jj=0)
+  function loglike(sig::Float64,beta::Array{Float64,1};bj=0,jj=0)
     new_beta = collect(beta)
 
     if jj > 0 
       new_beta[jj] = bj
     end
 
-    # NEED TO DO A FORMAL SPEED TEST
-    #Xb = [sum(X1[i,:] .* beta) for i in 1:N] # 51s
-    #Xb = sum([X1[i,j] * new_beta[j] for i in 1:N, j in 1:J],2) # 10s
-    if J < 20
-      if J == 2
-        Xb = new_beta[1] .+ X * new_beta[2] # 2s
-      else # 2 < J < 20
-        Xb = sum([X1[:,j] * new_beta[j] for j in 1:J]) # 4s
-      end
-    else # J ≥ 20
-      Xb = X1*new_beta # 121s
-    end
+    Xb = X1*new_beta # This is a case where defining types really speeds up things
 
     if model == "lognormal"
       lam = (y .+ Xb) / sig
@@ -103,16 +98,8 @@ function dic(post::Array{State_aft,1}, t, X, v; model="weibull")
   const X1 = [ones(N) X]
   const J = size(X1,2)
 
-  function loglike(sig::Real,beta::Array{Real,1})
-    if J < 20
-      if J == 2
-        Xb = beta[1] .+ X * beta[2] # 2s
-      else # 2 < J < 20
-        Xb = sum([X1[:,j] * beta[j] for j in 1:J]) # 4s
-      end
-    else # J ≥ 20
-      Xb = X1*beta # 121s
-    end
+  function loglike(sig::Float64,beta::Array{Float64,1})
+    Xb = X1*beta
 
     if model == "lognormal"
       lam = (y .+ Xb) / sig

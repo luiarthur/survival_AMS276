@@ -51,7 +51,7 @@ function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1},
   logprior_sig(sig::Float64) = (-a-1)*log(sig) - b/sig
 
   function loglike(sig::Float64,beta::Array{Float64,1};bj=0,jj=0)
-    new_beta = collect(beta)
+    new_beta = copy(beta)
 
     if jj > 0 
       new_beta[jj] = bj
@@ -77,7 +77,7 @@ function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1},
       MCMC.metropolis(state.sig, sig->loglike(sig,state.beta)+logprior_sig(sig), 
                       css, inbounds=x->x>0)
     # update bj
-    const new_beta = collect(state.beta)
+    const new_beta = copy(state.beta)
     for j in 1:J
       new_bj =
       MCMC.metropolis(new_beta[j], 

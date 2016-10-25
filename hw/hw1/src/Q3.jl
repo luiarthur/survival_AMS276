@@ -36,7 +36,6 @@ const x_all = tongue[:,1]
 immutable State
   lambda::Real
   alpha::Real
-  alpha_acc::Int
 end
                            # Priors:
 function update_gen(y,v,cs;a_alpha=.1,b_alpha=.1,a_lam=0,b_lam=0)
@@ -52,11 +51,10 @@ function update_gen(y,v,cs;a_alpha=.1,b_alpha=.1,a_lam=0,b_lam=0)
       sum(alpha.*v.*log(y)-new_lambda.*y.^alpha) -alpha*b_alpha
     end
 
-    const (new_alpha,new_alpha_acc) = 
-      mh_normal(state.alpha, loglike_plus_logprior, state.alpha_acc, cs, 
-                inbounds=x->x>0)
+    const new_alpha = 
+      metropolis(state.alpha, loglike_plus_logprior, cs, inbounds=x->x>0)
 
-    State(new_lambda,new_alpha, new_alpha_acc)
+      State(new_lambda,new_alpha)
   end
 
   return update
@@ -67,16 +65,16 @@ const burn = 1000
 
 update_a = update_gen(y_a,v_a,.3;a_alpha=.1,b_alpha=.1,a_lam=0,b_lam=0)
 update_d = update_gen(y_d,v_d,.3;a_alpha=.1,b_alpha=.1,a_lam=0,b_lam=0)
-@time out_a = gibbs(State(1,1,0),update_a,B,burn);
-@time out_d = gibbs(State(1,1,0),update_d,B,burn);
+@time out_a = gibbs(State(1,1),update_a,B,burn);
+@time out_d = gibbs(State(1,1),update_d,B,burn);
 
 lam_a= map(o->o.lambda, out_a)
 alp_a = map(o->o.alpha, out_a)
-acc_a = out_a[end].alpha_acc / length(out_a)
+acc_a = length(unique(alp_a)) / length(alp_a)
 
 lam_d= map(o->o.lambda, out_d)
 alp_d = map(o->o.alpha, out_d)
-acc_d = out_d[end].alpha_acc / length(out_d)
+acc_d = length(unique(alp_d)) / length(alp_d)
 
 @rput lam_a alp_a lam_d alp_d;
 R"pdf('../img/post_a.pdf')"
@@ -168,16 +166,13 @@ R"dev.off()"
 srand(256)
 #AFT Models
 include("AFT.jl")
-init = AFT.State_aft(1,zeros(2),1,zeros(Int,2))
 const N = length(y_all)
 y = collect(y_all)
 X = collect(x_all')'
 v = collect(v_all * 1.0)
 
 # Weibull
-@time aft_weib = AFT.aft(y, X, v, init, 
-                         zeros(Float64,2), [10.0,10.0], [1.0,1.0], 
-                         2.0,1.0,1.0,printFreq=10,B=B,burn=5000);
+@time aft_weib = AFT.aft(y, X, v, B=B, burn=1000);
 
 aft_weib_sig = map(o -> o.sig, aft_weib)
 aft_weib_b0 = map(o -> o.beta[1], aft_weib)
@@ -189,10 +184,7 @@ R"plotPosts(cbind(aft_weib_sig, aft_weib_b0, aft_weib_b1),legend.pos='right',cex
 R"dev.off()"
 
 # LogLogistic
-@time aft_loglog = AFT.aft(y, X, v, init, 
-                           zeros(Float64,2), [10.0,10.0], [1.0,1.0], 
-                           2.0,1.0,1.0,printFreq=10,B=B,burn=5000,
-                           model="loglogistic");
+@time aft_loglog = AFT.aft(y, X, v, B=B, burn=1000, model="loglogistic");
 
 aft_loglog_sig = map(o -> o.sig, aft_loglog)
 aft_loglog_b0 = map(o -> o.beta[1], aft_loglog)
@@ -204,10 +196,7 @@ R"plotPosts(cbind(aft_loglog_sig, aft_loglog_b0, aft_loglog_b1),legend.pos='righ
 R"dev.off()"
 
 # LogNormal
-@time aft_logNorm = AFT.aft(y, X, v, init, 
-                            zeros(Float64,2), [10.0,10.0], [1.0,1.0], 
-                            2.0,1.0,1.0,printFreq=10,B=B,burn=5000,
-                            model="lognormal");
+@time aft_logNorm = AFT.aft(y, X, v, B=B, burn=1000, model="lognormal");
 
 aft_logNorm_sig = map(o -> o.sig, aft_logNorm)
 aft_logNorm_b0 = map(o -> o.beta[1], aft_logNorm)

@@ -13,8 +13,22 @@ export State_aft, aft, dic
 immutable State_aft
   sig::Float64
   beta::Array{Float64,1}
-  sig_acc::Int
-  beta_acc::Array{Int,1}
+end
+
+function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1};
+             csb=1.0,css=1.0,model="weibull",B=1000,burn=100,printFreq=0)
+  const P = size(X,2) + 1
+  const m = zeros(Float64,P)
+  const s2 = fill(10.0,P)
+  const a = 2.0
+  const b = 1.0
+  const prior_mean_beta = m
+  const prior_mean_sig = b
+  const init = State_aft(prior_mean_sig, prior_mean_beta)
+  const csb_vec = fill(csb,P)
+
+  aft(t,X,v,init,m,s2,csb_vec,a,b,css,model=model,B=B,burn=burn,
+      printFreq=printFreq)
 end
 
 function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1}, 
@@ -59,32 +73,32 @@ function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1},
 
   function update_aft(state::State_aft)
     # update sig
-    const (new_sig, sig_acc) =
-      MCMC.mh_normal(state.sig, sig->loglike(sig,state.beta)+logprior_sig(sig), 
-                     state.sig_acc, css, inbounds=x->x>0)
+    const new_sig =
+      MCMC.metropolis(state.sig, sig->loglike(sig,state.beta)+logprior_sig(sig), 
+                      css, inbounds=x->x>0)
     # update bj
-    const new_beta_acc = Array{Int,1}(J)
     const new_beta = collect(state.beta)
     for j in 1:J
-      (new_bj, new_bj_acc) =
-      MCMC.mh_normal(new_beta[j], 
-                     bj -> loglike(new_sig,new_beta,bj=bj,jj=j) +
-                           logprior_beta(bj,m[j],s2[j]), 
-                     state.beta_acc[j], csb[j])
+      new_bj =
+      MCMC.metropolis(new_beta[j], 
+                      bj -> loglike(new_sig,new_beta,bj=bj,jj=j) +
+                            logprior_beta(bj,m[j],s2[j]), 
+                      csb[j])
 
       new_beta[j] = new_bj
-      new_beta_acc[j] = new_bj_acc
     end
     
-    return State_aft(new_sig, new_beta, sig_acc, new_beta_acc)
+    return State_aft(new_sig, new_beta)
   end # update_aft
 
 
   out = MCMC.gibbs(init, update_aft, B, burn, printFreq=printFreq)
 
   println()
-  println("σ acceptance rate: ", out[end].sig_acc / B)
-  println("β acceptance rate: ", out[end].beta_acc / B)
+  sig_acc = length(unique(map(o -> o.sig, out))) / B
+  beta_acc = length(unique(map(o -> o.beta, out))) / B
+  println("σ acceptance rate: ", sig_acc)
+  println("β acceptance rate: ", beta_acc)
 
   return out
 end # aft

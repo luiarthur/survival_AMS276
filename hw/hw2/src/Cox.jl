@@ -1,9 +1,9 @@
 module Cox
 
-using Distributions
+using Distributions, RCall
 import MCMC.gibbs, Base.show
 
-export coxph_weibull, summary_cox
+export coxph_weibull, summary, plot
 
 function part(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64})
   const tx = [t X]
@@ -25,7 +25,8 @@ function part(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64})
 end
 
 include("coxph_weibull.jl")
-include("summary_cox.jl")
+include("summary.jl")
+include("plot.jl")
 
 #=
 #const Model = [:weibull, :piecewise, :gammaProcess]

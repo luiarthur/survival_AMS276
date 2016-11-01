@@ -18,7 +18,7 @@ end
 
 const quants = [0., .025, .25, .5, .75, .975, 1.]
 
-function summary_cox(model::Cox_weib)
+function summary(model::Cox_weib)
   const β= hcat(map(o -> o.β, model.params)...)'
   const (B,P) = size(β)
   const β̄= vec(mean(β,1))

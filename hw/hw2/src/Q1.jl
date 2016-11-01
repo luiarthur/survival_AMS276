@@ -1,5 +1,6 @@
 using RCall
 include("Cox.jl")
+Diag(v::Vector{Float64}) = convert(Matrix{Float64}, Diagonal(v))
 
 R"""
 library(KMsurv)
@@ -30,15 +31,19 @@ const x = reshape(tongue[:type],length(t),1)
 
 srand(276);
 
-B = 10000; burn = 20000; Σ = eye(3) * .005
+B = 10000; burn = 20000; Σ = Diag([.005,.01,.01])#eye(3) * .005
 @time m1 = Cox.coxph_weibull(t,x,d,Σ,B=B,burn=burn);
-s1 = Cox.summary_cox(m1)
-println(s1)
+Cox.summary(m1)
+Cox.plot(m1);
 
-beta = map(p -> p.β[1], m1.params)
-alpha = map(p -> p.α, m1.params)
-lambda = map(p -> p.λ, m1.params)
-
-@rput beta lambda alpha
-
-R"plotPosts(cbind(beta,alpha,lambda),show.x=F)";
+R"""
+data(larynx)
+L <- as.matrix(larynx)
+"""
+@rget L
+@time m = Cox.coxph_weibull(L[:,2],L[:,[1,3,4]],L[:,5],
+                            Diag([1E-2,1E-2,1E-2,1E-5,1E-5]),
+                            B=10000,burn=30000);
+Cox.summary(m)
+println(R"coxph(Surv(time,delta) ~ ., data=larynx)")
+Cox.plot(m);

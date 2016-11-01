@@ -14,8 +14,8 @@ end
 function loglike_weibull(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64})
   const (t_obs, X_obs) = part(t,X,v)
 
-  log_h(p::Param_weib) = sum((p.α-1) * log(t_obs) + log(p.α) + p.λ + X_obs*p.β)
-  log_S(p::Param_weib) = -sum(exp(X * p.β) .* t.^p.α * exp(p.λ))
+  log_h(p::Param_weib) = sum(p.α * log(t_obs) + log(p.α*p.λ) + X_obs*p.β)
+  log_S(p::Param_weib) = -sum(exp(X * p.β) .* t.^p.α .* p.λ)
   ll(p::Param_weib) = log_h(p) + log_S(p)
 
   return ll

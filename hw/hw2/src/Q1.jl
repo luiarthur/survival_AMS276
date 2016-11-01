@@ -1,5 +1,5 @@
 using RCall
-include("../../hw1/src/AFT.jl")
+include("Cox.jl")
 
 R"""
 library(KMsurv)
@@ -19,24 +19,26 @@ tongue$type <- ifelse(tongue$type==1,1,0)
 
 # see the result
 survreg(Surv(time,delta) ~ type, dist='weibull', data=tongue)
-coxph(Surv(time,delta) ~ type, data=tongue)
+print(coxph(Surv(time,delta) ~ type, data=tongue))
 """
-
 @rget tongue
+println()
 
 const t = tongue[:time]
 const d = tongue[:delta]
 const x = reshape(tongue[:type],length(t),1)
-const B = 10000
-const burn = 5000
 
 srand(276);
 
-@time m1 = AFT.aft(t, x, d, B=B, burn=burn);
+B = 10000; burn = 20000; Σ = eye(3) * .005
+@time m1 = Cox.coxph_weibull(t,x,d,Σ,B=B,burn=burn);
+s1 = Cox.summary_cox(m1)
+println(s1)
 
-b_post = hcat(map(x -> x.beta, m1)...)'
-s_post = map(x -> x.sig, m1)
+beta = map(p -> p.β[1], m1.params)
+alpha = map(p -> p.α, m1.params)
+lambda = map(p -> p.λ, m1.params)
 
-@rput b_post s_post;
-R"plotPosts(b_post)";
-R"plotPost(s_post)";
+@rput beta lambda alpha
+
+R"plotPosts(cbind(beta,alpha,lambda),show.x=F)";

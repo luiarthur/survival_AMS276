@@ -19,12 +19,8 @@ tongue$type <- ifelse(tongue$type==1,1,0)
 # aneuplod = 1
 #  diploid = 0
 
-# see the result
-survreg(Surv(time,delta) ~ type, dist='weibull', data=tongue)
-print(coxph(Surv(time,delta) ~ type, data=tongue))
 """
 @rget tongue
-println()
 
 
 ### Analysis
@@ -39,3 +35,5 @@ B = 10000; burn = 20000; Σ = Cox.Diag([.005,.01,.01])
 Cox.summary(m1)
 Cox.plot(m1);
 
+println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
+println(R"summary(survreg(Surv(time,delta) ~ type, dist='weibull', data=tongue))")

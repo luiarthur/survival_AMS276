@@ -23,7 +23,7 @@ function summary(model::Cox_weib)
   const (B,P) = size(β)
   const β̄= vec(mean(β,1))
   const std_β = vec(std(β,1))
-  const quantile_β = hcat([ quantile(β[:,p], quants) for p in 1:P]...)
+  const quantile_β = hcat([ quantile(β[:,p], quants) for p in 1:P]...)'
 
   const α = map(o -> sqrt(o.α), model.params)
   const ᾱ = mean(α)
@@ -46,11 +46,11 @@ end
 
 function show(io::IO, SL::Summary_lm)
   const P = length(SL.β̄)
-  zeroInCI = [SL.quantile_β[2,p] <= 0 <= SL.quantile_β[6,p] ? "" : "*" for p in 1:P]
+  zeroInCI = SL.quantile_β[:,2] .<= 0 .<= SL.quantile_β[:,6]
 
   @printf "%5s%10s%10s%3s\n" "" "mean" "std" "≠0"
   for k in 1:P
-    @printf "%5s%10.4f%10.4f%3s\n" string("β",k) SL.β̄[k] SL.std_β[k] zeroInCI[k]
+    @printf "%5s%10.4f%10.4f%3s\n" string("β",k) SL.β̄[k] SL.std_β[k] zeroInCI[k] ? "" : "*"
   end
   @printf "%5s%10.4f%10.4f\n" "α" SL.ᾱ SL.std_α
   @printf "%5s%10.4f%10.4f\n" "λ" SL.λ̄ SL.std_λ

@@ -1,5 +1,5 @@
 include("Cox.jl")
-include("../AFT/AFT.jl")
+include("../../AFT/AFT.jl")
 using RCall
 
 R"""

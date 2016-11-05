@@ -1,5 +1,4 @@
 include("Cox/Cox.jl")
-include("AFT/AFT.jl")
 
 # Read data from R
 using RCall
@@ -35,13 +34,12 @@ srand(276);
 B = 10000; burn = 20000; Σ = Cox.Diag([.005,.01,.01])
 @time m1 = Cox.coxph_weibull(t,x,d,Σ,B=B,burn=burn);
 println(Cox.summary(m1))
-Cox.plot(m1);
+#Cox.plot(m1);
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
 
-
-#= AFT
-@time m2 = AFT.aft(t,[ones(N) x],d,[.5,.1],.5,B=B,burn=burn,model="weibull");
-b = hcat(map(m -> m.beta, m2)...)'; mean(b,1)
-@rput b; R"plotPosts(b)";
-println(R"summary(survreg(Surv(time,delta) ~ type, dist='weibull', data=tongue))")
-=#
+### PCH
+J = 10
+grid = [0; quantile(t,linspace(0,1,J))]
+priorβ = Cox.Priorβ([0.],eye(1)*10.,eye(1)*.1)
+priorλ = Cox.Priorλ(zeros(Float64,J),eye(Float64,J)*10,eye(Float64,J)*1E-4)
+@time m2 = Cox.pch(t,x,d,grid,priorβ,priorλ,100,1000,printFreq=100)

@@ -1,9 +1,9 @@
 module PCH # piecewise-constant hazards
 
 using Distributions, RCall
-import MCMC.gibbs, Base.show, Base.summary
+import MCMC, Base.show, Base.summary
 
-export summary, plot, pch, Priorᵦ, Priorᵧ
+export summary, plot, pch, Priorβ, Priorλ
 
 include("pch.jl")
 include("summary.jl")

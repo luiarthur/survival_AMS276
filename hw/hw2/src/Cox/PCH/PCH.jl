@@ -1,20 +1,12 @@
 module PCH # piecewise-constant hazards
 
 using Distributions, RCall
-import MCMC
+import MCMC.gibbs, Base.show, Base.summary
 
-immutable Priorᵦ
-  mean::Vector{Float64}
-  cov::Matrix{Float64}
-  proposal::Matrix{Float64}
-end
+export summary, plot, pch, Priorᵦ, Priorᵧ
 
-immutable Priorᵧ
-  mean::Vector{Float64}
-  var::Vector{Float64}
-end
-
-function pch(y::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64}, 
-             grid::Vector{Float64},)
+include("pch.jl")
+include("summary.jl")
+include("plot.jl")
 
 end # PCH

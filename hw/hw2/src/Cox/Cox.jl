@@ -4,7 +4,7 @@ export Diag
 
 Diag{T <: Real}(v::Vector{T}) = Matrix(Diagonal(v))
 
-include("Parametric/Parametric.jl"); using .parametric
-include("Parametric/PCH.jl"); using .parametric
+include("Parametric/Parametric.jl"); using .Parametric
+include("PCH/PCH.jl");
 
 end # Cox

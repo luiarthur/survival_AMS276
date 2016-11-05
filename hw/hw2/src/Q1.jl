@@ -1,4 +1,5 @@
 include("Cox/Cox.jl")
+include("AFT/AFT.jl")
 
 # Read data from R
 using RCall
@@ -18,15 +19,15 @@ tongue$delta <- ifelse(tongue$delta==1,1,0)
 tongue$type <- ifelse(tongue$type==1,1,0)
 # aneuplod = 1
 #  diploid = 0
-
-"""
-@rget tongue
+""";
+@rget tongue;
 
 
 ### Analysis
-const t = tongue[:time]
-const d = tongue[:delta]
-const x = reshape(tongue[:type],length(t),1)
+const t = tongue[:time];
+const d = tongue[:delta];
+const x = reshape(tongue[:type],length(t),1);
+const N = length(t);
 
 srand(276);
 
@@ -36,4 +37,8 @@ Cox.summary(m1)
 Cox.plot(m1);
 
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
-println(R"summary(survreg(Surv(time,delta) ~ type, dist='weibull', data=tongue))")
+
+println(R"summary(survreg(Surv(time,delta) ~ type, dist='loglogistic', data=tongue))")
+@time m2 = AFT.aft(t,[ones(N) x],d,[.05,.01],.3,B=B,burn=burn,model="loglogistic");
+b = hcat(map(m -> m.beta, m2)...)'
+@rput b; R"plotPosts(b)";

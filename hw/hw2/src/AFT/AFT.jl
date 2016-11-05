@@ -35,7 +35,7 @@ function loglike(sig::Float64, beta::Vector{Float64},
   Xb = X*beta 
 
   return sum([logpdf(timeDist, t[i], Xb[i], sig)*v[i] + 
-              logccdf(timeDist, t[i], Xb[i], sig) *(1-v[i]) for i in 1:N])
+              logccdf(timeDist, t[i], Xb[i], sig)*(1-v[i]) for i in 1:N])
 end
 
 function aft(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
@@ -61,17 +61,18 @@ function aft(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   assert(in(model,["weibull","lognormal","loglogistic"]))
 
-  const init = State_aft(a>1 ? b/(a-1) : 1, m)
+  #const init = State_aft(a>1 ? b/(a-1) : 1, m)
+  const init = State_aft(1.0, m)
   const N = length(t)
   const J = size(X,2)
   const Σ⁻¹ᵦ = inv(Matrix(Diagonal(s2)))
   const Σ = Matrix(Diagonal(csb))
 
-  #logprior_beta(bj::Float64,mj::Float64, s2j::Float64) = -(bj-mj)^2 / (2*s2j)
-  logprior_beta(b::Vector{Float64}) = ((b-m)'Σ⁻¹ᵦ*(b-m))[1] / -2
+  logprior_beta(b::Vector{Float64}) = -((b-m)'Σ⁻¹ᵦ*(b-m))[1] / 2
+  #logprior_beta(b::Vector{Float64}) = -(b'b)[1] / 2
   logprior_sig(sig::Float64) = (-a-1)*log(sig) - b/sig
   function ll(sig::Float64,beta::Vector{Float64},model::String)
-    loglike(sig,beta,t,X,v,model)
+    return loglike(sig,beta,t,X,v,model)
   end
 
   function update_aft(state::State_aft)
@@ -96,8 +97,8 @@ function aft(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   out = MCMC.gibbs(init, update_aft, B, burn, printFreq=printFreq)
 
   println()
-  sig_acc = length(unique(map(o -> o.sig, out))) / B
   beta_acc = length(unique(map(o -> o.beta, out))) / B
+  sig_acc = length(unique(map(o -> o.sig, out))) / B
   println("β acceptance rate: ", beta_acc)
   println("σ acceptance rate: ", sig_acc)
 

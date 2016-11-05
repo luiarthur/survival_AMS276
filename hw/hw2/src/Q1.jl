@@ -31,14 +31,17 @@ const N = length(t);
 
 srand(276);
 
+### Cox
 B = 10000; burn = 20000; Σ = Cox.Diag([.005,.01,.01])
 @time m1 = Cox.coxph_weibull(t,x,d,Σ,B=B,burn=burn);
-Cox.summary(m1)
+println(Cox.summary(m1))
 Cox.plot(m1);
-
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
 
-println(R"summary(survreg(Surv(time,delta) ~ type, dist='loglogistic', data=tongue))")
-@time m2 = AFT.aft(t,[ones(N) x],d,[.05,.01],.3,B=B,burn=burn,model="loglogistic");
-b = hcat(map(m -> m.beta, m2)...)'
+
+#= AFT
+@time m2 = AFT.aft(t,[ones(N) x],d,[.5,.1],.5,B=B,burn=burn,model="weibull");
+b = hcat(map(m -> m.beta, m2)...)'; mean(b,1)
 @rput b; R"plotPosts(b)";
+println(R"summary(survreg(Surv(time,delta) ~ type, dist='weibull', data=tongue))")
+=#

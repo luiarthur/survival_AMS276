@@ -15,6 +15,24 @@ immutable State_aft
   beta::Array{Float64,1}
 end
 
+function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1},
+             csb_vec::Vector{Float64},css::Float64=1.0;
+             model::String="weibull",
+             B::Int=1000,burn::Int=100,printFreq::Int=0)
+  const P = size(X,2) + 1
+  const m = zeros(Float64,P)
+  const s2 = fill(10.0,P)
+  const a = 2.0
+  const b = 1.0
+  const prior_mean_beta = m
+  const prior_mean_sig = b
+  const init = State_aft(prior_mean_sig, prior_mean_beta)
+
+  aft(t,X,v,init,m,s2,csb_vec,a,b,css,model=model,B=B,burn=burn,
+      printFreq=printFreq)
+end
+
+
 function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1};
              csb=1.0,css=1.0,model="weibull",B=1000,burn=100,printFreq=0)
   const P = size(X,2) + 1
@@ -96,7 +114,7 @@ function aft(t::Array{Float64,1}, X::Array{Float64,2}, v::Array{Float64,1},
 
   println()
   sig_acc = length(unique(map(o -> o.sig, out))) / B
-  beta_acc = length(unique(map(o -> o.beta, out))) / B
+  beta_acc = [length(unique(map(o -> o.beta[j], out))) for j in 1:J] / B
   println("σ acceptance rate: ", sig_acc)
   println("β acceptance rate: ", beta_acc)
 

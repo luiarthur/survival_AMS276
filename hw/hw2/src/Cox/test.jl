@@ -1,10 +1,11 @@
 include("Cox.jl")
-include("../../../hw1/src/AFT.jl")
+include("../AFT/AFT.jl")
 using RCall
 
 R"""
 library(KMsurv)
 library(survival)
+library(rcommon)
 data(larynx)
 L <- as.matrix(larynx)
 """
@@ -23,7 +24,7 @@ s = Cox.summary(m)
 Cox.plot(m);
 
 
-@time m2 = AFT.aft(t, X, v, [.3,.15,.005,.005], .5, B=10000, burn=500000);
+@time m2 = AFT.aft(t, X, v, [100,10,5,1]*1E-5, .3, B=10000, burn=200000, model="loglogistic");
 b = hcat(map(m -> m.beta, m2)...)'; mean(b,1)
 @rput b; R"plotPosts(b)";
 println(R"summary(survreg(Surv(time,delta) ~ ., data=larynx))")

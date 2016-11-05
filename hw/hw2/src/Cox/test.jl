@@ -22,14 +22,8 @@ println(R"summary(coxph(Surv(time,delta) ~ ., data=larynx))")
 s = Cox.summary(m)
 Cox.plot(m);
 
-#=
-update AFT.aft so that it can have matrix proposal
-=#
 
-
-@time m2 = AFT.aft(t, X, v, css=.5, csb=.05, B=2000, burn=100000);
-b = hcat(map(m -> m.beta, m2)...)';
-mean(b,1)
-@rput b;
-R"plotPosts(b)";
-
+@time m2 = AFT.aft(t, X, v, [.3,.15,.005,.005], .5, B=10000, burn=500000);
+b = hcat(map(m -> m.beta, m2)...)'; mean(b,1)
+@rput b; R"plotPosts(b)";
+println(R"summary(survreg(Surv(time,delta) ~ ., data=larynx))")

@@ -42,7 +42,7 @@ function aft(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
              csb_vec::Vector{Float64},css::Float64=1.0;
              model::String="weibull",
              B::Int=1000,burn::Int=100,printFreq::Int=0)
-  const P = size(X,2) + 1
+  const P = size(X,2)
   const m = zeros(Float64,P)
   const s2 = fill(1E2,P)
   const a = 2.0
@@ -63,8 +63,7 @@ function aft(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   const init = State_aft(a>1 ? b/(a-1) : 1, m)
   const N = length(t)
-  const X1 = [ones(N) X]
-  const J = size(X1,2)
+  const J = size(X,2)
   const Σ⁻¹ᵦ = inv(Matrix(Diagonal(s2)))
   const Σ = Matrix(Diagonal(csb))
 
@@ -72,7 +71,7 @@ function aft(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   logprior_beta(b::Vector{Float64}) = ((b-m)'Σ⁻¹ᵦ*(b-m))[1] / -2
   logprior_sig(sig::Float64) = (-a-1)*log(sig) - b/sig
   function ll(sig::Float64,beta::Vector{Float64},model::String)
-    loglike(sig,beta,t,X1,v,model)
+    loglike(sig,beta,t,X,v,model)
   end
 
   function update_aft(state::State_aft)
@@ -110,10 +109,9 @@ function dic(post::Vector{State_aft}, t, X, v; model="weibull")
   assert(size(X,1)==length(t))
 
   const N = length(t)
-  const X1 = [ones(N) X]
-  const J = size(X1,2)
+  const J = size(X,2)
   function ll(sig::Float64,beta::Vector{Float64},model::String)
-    loglike(sig,beta,t,X1,v,model)
+    loglike(sig,beta,t,X,v,model)
   end
 
   const D = [-2 * ll(p.sig, p.beta, model) for p in post]

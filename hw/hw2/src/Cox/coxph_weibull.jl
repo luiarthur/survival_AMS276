@@ -21,9 +21,9 @@ function loglike_weibull(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float
   return ll
 end
 
-logprior_β(β::Vector{Float64}) = (- β'β / 200)[1]
-logprior_α(α::Float64) = logpdf(Gamma(.1,10),α)
-logprior_λ(λ::Float64) = logpdf(InverseGamma(2,1),λ)
+logprior_β(β::Vector{Float64}) = 0. #(- β'β / 200)[1]
+logprior_α(α::Float64) = logpdf(Gamma(.1,10),α) #logpdf(Gamma(.1,10),α)
+logprior_λ(λ::Float64) = logpdf(Gamma(.1,10),λ)
 
 function coxph_weibull(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
                        Σ::Matrix{Float64}; B::Int=2000, burn::Int=100)

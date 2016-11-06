@@ -22,7 +22,7 @@ function pch(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   assert(grid[1] == 0)
   const J = length(grid) - 1
   function s(j::Int)
-    assert(j <= J)
+    assert(0 <= j <= J)
     return grid[j+1]
   end
   const (N,P) = size(X)
@@ -32,7 +32,7 @@ function pch(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   function h₀(tᵢ::Float64, λ::Vector{Float64})
     assert(length(λ) == J)
-    return sum([ s(j-1)<tᵢ<s(j) ? λ[j] : 0 for j in 1:J])
+    return sum([ s(j-1)<tᵢ<=s(j) ? λ[j] : 0. for j in 1:J])
   end
 
   function H₀(tᵢ::Float64, λ::Vector{Float64})
@@ -49,22 +49,37 @@ function pch(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   function loglike(β::Vector{Float64}, λ::Vector{Float64})
     const Xb = X*β
-    return sum([ v[i] * (log(h₀(t[i],λ)) + Xb[i]) - 
-                 (1-v[i]) * H₀(t[i],λ) * exp(Xb[i]) for i in 1:N])
+    if any(λ .< 0) 
+      out = 0. 
+    else
+      out = sum([ v[i] * (log(h₀(t[i],λ)) + Xb[i]) - 
+                 (1-v[i]) * H₀(t[i],λ) * exp(Xb[i]) for i in 1:N ])
+    end
+
+    return out
   end
   
   logpriorβ(β::Vector{Float64}) = (-(β-priorβ.m)'S⁻¹ᵦ*(β-priorβ.m)/2)[1]
-  logpriorλ(λ::Vector{Float64}) = (-(λ-priorλ.m)'S⁻¹ₗ*(λ-priorλ.m)/2)[1]
+  function logpriorλ(λ::Vector{Float64})
+    if any(λ .< 0)
+      out = -Inf
+    else
+      out = sum((.1-1) * log(λ) - .1 * λ)
+    end
+    return out
+  end
+  #logpriorλ(λ::Vector{Float64}) = (-(λ-priorλ.m)'S⁻¹ₗ*(λ-priorλ.m)/2)[1]
   function ll_plus_lp(β::Vector{Float64},λ::Vector{Float64})
-    return logpriorβ(β) + logpriorλ(λ) + loglike(β,λ) 
+    #return logpriorβ(β) + logpriorλ(λ) + loglike(β,exp(λ))
+    return logpriorβ(β) + logpriorλ(λ) + loglike(β,λ)
   end
 
   function update(curr::State)
-    const newβ = MCMC.metropolis(curr.β, priorβ.Σ, β->ll_plus_lp(β,log(curr.λ)))
-    const newλ = MCMC.metropolis(log(curr.λ), priorλ.Σ, λ->ll_plus_lp(newβ,λ))
-    return State(newβ, exp(newλ))
+    const newβ = MCMC.metropolis(curr.β, priorβ.Σ, β->ll_plus_lp(β,curr.λ))
+    const newλ = MCMC.metropolis(curr.λ, priorλ.Σ, λ->ll_plus_lp(newβ,λ))
+    return State(newβ, newλ)
   end
 
-  const init = State(priorβ.m, exp(priorλ.m))
+  const init = State(priorβ.m, priorλ.m)
   return MCMC.gibbs(init, update, B, burn, printFreq=printFreq)
 end

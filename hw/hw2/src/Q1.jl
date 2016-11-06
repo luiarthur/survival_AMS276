@@ -31,15 +31,21 @@ const N = length(t);
 srand(276);
 
 ### Cox
+#=
 B = 10000; burn = 20000; Σ = Cox.Diag([.005,.01,.01])
 @time m1 = Cox.coxph_weibull(t,x,d,Σ,B=B,burn=burn);
 println(Cox.summary(m1))
 #Cox.plot(m1);
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
+=#
 
 ### PCH
-J = 10
+J = 3
 grid = [0; quantile(t,linspace(0,1,J))]
-priorβ = Cox.Priorβ([0.],eye(1)*10.,eye(1)*.1)
-priorλ = Cox.Priorλ(zeros(Float64,J),eye(Float64,J)*10,eye(Float64,J)*1E-4)
-@time m2 = Cox.pch(t,x,d,grid,priorβ,priorλ,100,1000,printFreq=100)
+priorβ = Cox.Priorβ([0.],eye(1)*10.,eye(1)*1E-5)
+priorλ = Cox.Priorλ(ones(Float64,J),eye(Float64,J)*1E-1,eye(Float64,J)*1E-5)
+@time m2 = Cox.pch(t,x,d,grid,priorβ,priorλ,10000,1000,printFreq=100)
+b = map(m -> m.β[1], m2); mean(b)
+λ = hcat(map(m -> m.λ, m2)...)'; mean(λ,1)
+
+### FIX THE loglike and logprior in pch!!!

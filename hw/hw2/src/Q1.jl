@@ -45,7 +45,5 @@ grid = [0; quantile(t,linspace(0,1,J))]
 priorβ = Cox.Priorβ([0.], eye(1)*10., eye(1)*1E-5)
 priorλ = Cox.Priorλ(fill(.1,J), fill(.1,J), eye(Float64,J)*1E-5)
 @time m2 = Cox.pch(t,x,d,grid,priorβ,priorλ,10000,1000,printFreq=100)
-b = map(m -> m.β[1], m2); mean(b)
-λ = hcat(map(m -> m.λ, m2)...)'; mean(λ,1)
 
 ### FIX THE loglike and logprior in pch!!!

@@ -1,12 +1,16 @@
 immutable Priorβ
+  # Prior: Normal(m,S) 
+  # Proposal Step: Σ
   m::Vector{Float64}
   S::Matrix{Float64}
   Σ::Matrix{Float64}
 end
 
 immutable Priorλ
-  m::Vector{Float64}
-  S::Matrix{Float64}
+  # Prior: λⱼ~ Gamma(aⱼ, bⱼ) 
+  # Proposal Step: Σ
+  a::Vector{Float64}
+  b::Vector{Float64}
   Σ::Matrix{Float64}
 end
 
@@ -28,7 +32,6 @@ function pch(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   const (N,P) = size(X)
   assert(length(t) == N && length(v) == N)
   const S⁻¹ᵦ = inv(priorβ.S)
-  const S⁻¹ₗ = inv(priorλ.S)
 
   function h₀(tᵢ::Float64, λ::Vector{Float64})
     assert(length(λ) == J)
@@ -60,26 +63,19 @@ function pch(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   end
   
   logpriorβ(β::Vector{Float64}) = (-(β-priorβ.m)'S⁻¹ᵦ*(β-priorβ.m)/2)[1]
-  function logpriorλ(λ::Vector{Float64})
-    if any(λ .< 0)
-      out = -Inf
-    else
-      out = sum((.1-1) * log(λ) - .1 * λ)
-    end
-    return out
-  end
-  #logpriorλ(λ::Vector{Float64}) = (-(λ-priorλ.m)'S⁻¹ₗ*(λ-priorλ.m)/2)[1]
-  function ll_plus_lp(β::Vector{Float64},λ::Vector{Float64})
-    #return logpriorβ(β) + logpriorλ(λ) + loglike(β,exp(λ))
-    return logpriorβ(β) + logpriorλ(λ) + loglike(β,λ)
+  logprior_logλ(logλ::Vector{Float64}) = sum(-logλ.*(priorλ.a-1) - priorλ.b .* exp(logλ))
+
+  function ll_plus_lp(β::Vector{Float64},logλ::Vector{Float64})
+    return logpriorβ(β) + logprior_logλ(logλ) + loglike(β,exp(logλ))
   end
 
   function update(curr::State)
-    const newβ = MCMC.metropolis(curr.β, priorβ.Σ, β->ll_plus_lp(β,curr.λ))
-    const newλ = MCMC.metropolis(curr.λ, priorλ.Σ, λ->ll_plus_lp(newβ,λ))
-    return State(newβ, newλ)
+    const curr_logλ = log(curr.λ)
+    const newβ = MCMC.metropolis(curr.β, priorβ.Σ, β->ll_plus_lp(β,curr_logλ))
+    const new_logλ = MCMC.metropolis(curr_logλ, priorλ.Σ, logλ->ll_plus_lp(newβ,logλ))
+    return State(newβ, exp(new_logλ))
   end
 
-  const init = State(priorβ.m, priorλ.m)
+  const init = State(priorβ.m, priorλ.a ./ priorλ.b)
   return MCMC.gibbs(init, update, B, burn, printFreq=printFreq)
 end

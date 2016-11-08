@@ -1,4 +1,4 @@
-module PCH # piecewise-constant hazards
+module GammaProcess
 
 using Distributions, RCall
 import MCMC, Base.show
@@ -11,4 +11,4 @@ include("plot.jl")
 include("plotsurv.jl")
 include("est_survival.jl")
 
-end # PCH
+end # GammaProcess

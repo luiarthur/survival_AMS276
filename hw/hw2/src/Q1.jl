@@ -60,6 +60,21 @@ Cox.PCH.plotsurv(grid, mean_S_pch, lwd=3, col_l=["blue","orange"],
              addlines=true)
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue))";
 
+### GP
+@time m3 = Cox.GammaProcess.gp(t,x,d,10.,.1,2000,10000, printFreq=500);
+s3 = Cox.GammaProcess.summary(m3)
+GammaProcess.plot(m3,"beta",[1,2,3,4]);
+GammaProcess.plot(m3,"h",[1,2,3,4,5]);
+GammaProcess.plot(m3,"h",[6,7,8,9,10]);
+
+const grid = sort(unique([0;t]))
+age = 60.
+x0 = [[0,0,0,age],[1,0,0,age],[0,1,0,age],[0,0,1,age]]
+S3 = GammaProcess.est_survival(m3, grid, x0, mean)
+PCH.plotsurv(grid, S3, lwd=3, col_l=["black","blue","red","green"],
+             fg="grey",xlab="time", ylab="Survival Probability",
+             main="Probability of Survival for different Stages",addlines=true);
+R"lines(survfit(Surv(time,delta) ~ as.factor(stage), data=larynx))";
 
 ###
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")

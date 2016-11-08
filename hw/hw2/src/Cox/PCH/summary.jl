@@ -46,7 +46,7 @@ function show(io::IO, S::Summary_PCH)
 
   @printf "%5s%10s%10s%10s%10s%3s\n" "" "mean" "std" "lower" "upper" "≠0"
   for p in 1:P
-    @printf "%5s%10.4f%10.4f%10.4f%10.4f%3s\n" string("β",p) S.β̄[p] S.std_β[p] S.quantile_β[p,2] S.quantile_λ[p,6] zeroInCI[p] ? "" : "*"
+    @printf "%5s%10.4f%10.4f%10.4f%10.4f%3s\n" string("β",p) S.β̄[p] S.std_β[p] S.quantile_β[p,2] S.quantile_β[p,6] zeroInCI[p] ? "" : "*"
   end
 
   println(repeat("-",48))

@@ -34,7 +34,7 @@ function est_survival(pch::Vector{State},grid::Vector{Float64},x::Vector{Float64
 
   const H0 = [H₀(g, lambda[b,:]) for b in 1:B, g in grid]
   const S0 = exp(-H0)
-  const S = [S0[b,j] ^ (exp(x'beta[b,:]))[1] for j in 1:length(grid), b in 1:B]
+  const S = [S0[b,j] ^ (exp(x'beta[b,:])[1]) for j in 1:length(grid), b in 1:B]
   
   return S
 end

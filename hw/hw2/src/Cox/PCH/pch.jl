@@ -53,7 +53,7 @@ function pch(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   function loglike(β::Vector{Float64}, λ::Vector{Float64})
     const Xb = X*β
     return sum([ v[i] * (log(h₀(t[i],λ)) + Xb[i]) - 
-                 (1-v[i]) * H₀(t[i],λ) * exp(Xb[i]) for i in 1:N ])
+                 H₀(t[i],λ) * exp(Xb[i]) for i in 1:N ])
   end
   
   logpriorβ(β::Vector{Float64}) = (-(β-priorβ.m)'S⁻¹ᵦ*(β-priorβ.m)/2)[1]

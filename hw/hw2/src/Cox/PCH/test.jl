@@ -26,7 +26,7 @@ const N = length(t)
 ### PCH
 P = size(X,2)
 #grid = collect(linspace(0,maximum(t),10))
-grid = [0; quantile(t, linspace(0,1,10))]
+grid = [0; quantile(t, linspace(0,1,30))]
 J = length(grid) - 1
 Σᵦ = sym(inv(X'X)) * 1.5
 priorβ = PCH.Priorβ(fill(0.,P), eye(P)*10., Σᵦ) 
@@ -38,7 +38,8 @@ println(R"coxph(Surv(lt,lv)~L)")
 s2 = PCH.summary(m2)
 println(s2)
 
-x0 = [[0,0,0,60.],[1,0,0,60.],[0,1,0,60.],[0,0,1,60.]]
+age = 60.
+x0 = [[0,0,0,age],[1,0,0,age],[0,1,0,age],[0,0,1,age]]
 mean_S = PCH.est_survival(m2, grid, x0, mean)
 q_025_S = PCH.est_survival(m2, grid, x0, s->quantile(s,.025))
 q_975_S = PCH.est_survival(m2, grid, x0, s->quantile(s,.975))

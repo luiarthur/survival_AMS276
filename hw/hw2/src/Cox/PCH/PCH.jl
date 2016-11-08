@@ -10,5 +10,6 @@ include("summary.jl")
 include("plot.jl")
 include("plotsurv.jl")
 include("est_survival.jl")
+include("plotCI.jl")
 
 end # PCH

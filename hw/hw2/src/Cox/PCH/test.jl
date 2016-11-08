@@ -36,6 +36,7 @@ PCH.plot(m2,"beta",collect(1:P));
 PCH.plot(m2,"lambda",collect(1:4));
 println(R"coxph(Surv(lt,lv)~L)")
 s2 = PCH.summary(m2)
+println(R"coxph(Surv(time,delta) ~ as.factor(stage) + age, data=larynx)")
 println(s2)
 
 age = 60.
@@ -43,12 +44,17 @@ x0 = [[0,0,0,age],[1,0,0,age],[0,1,0,age],[0,0,1,age]]
 mean_S = PCH.est_survival(m2, grid, x0, mean)
 q_025_S = PCH.est_survival(m2, grid, x0, s->quantile(s,.025))
 q_975_S = PCH.est_survival(m2, grid, x0, s->quantile(s,.975))
-PCH.plotsurv(grid, mean_S, lwd=3, col_l=["black","blue","red","green"],
-             fg="grey",xlab="time", ylab="Survival Probability",
-             main="Probability of Survival for different Stages",addlines=true)
 PCH.plotsurv(grid, q_025_S, lwd=3, col_l=["black","blue","red","green"],
              fg="grey",xlab="time", ylab="Survival Probability",add=false,
              main="Probability of Survival for different Stages",addlines=true)
 PCH.plotsurv(grid, q_975_S, lwd=3, col_l=["black","blue","red","green"],
              fg="grey",xlab="time", ylab="Survival Probability",add=false,
              main="Probability of Survival for different Stages",addlines=true)
+
+PCH.plotsurv(grid, mean_S, lwd=3, col_l=["black","blue","red","green"],
+             fg="grey",xlab="time", ylab="Survival Probability",
+             main="Probability of Survival for different Stages",addlines=true);
+R"lines(survfit(Surv(time,delta) ~ as.factor(stage), data=larynx))";
+#=
+sf <- survfit(Surv(time,delta) ~ as.factor(stage) + age, data=larynx)
+=#

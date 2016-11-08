@@ -51,6 +51,7 @@ priorβ = Cox.Priorβ([0.], eye(1)*10., Σᵦ)
 priorλ = Cox.Priorλ(fill(.1,J), fill(.1,J), eye(Float64,J)*1E-1)
 @time m2 = Cox.pch(t,x,d,grid,priorβ,priorλ,2000,10000,printFreq=500);
 s2 = Cox.PCH.summary(m2)
+println(s2)
 Cox.PCH.plot(m2,"beta", [1]);
 
 x0 = [[0.], [1.]]
@@ -62,8 +63,9 @@ Cox.PCH.plotsurv(grid, mean_S_pch, lwd=3, col_l=["blue","orange"],
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue))";
 
 ### GP
-@time m3 = Cox.GammaProcess.gp(t,x,d,5.,.07,2000,10000, printFreq=500);
+@time m3 = Cox.GammaProcess.gp(t,x,d,5.,.07,2000,1000, printFreq=500);
 s3 = Cox.GammaProcess.summary(m3)
+println(s3)
 Cox.GammaProcess.plot(m3,"beta", [1]);
 Cox.GammaProcess.plot(m3,"h",[1,2,3,4,5]);
 Cox.GammaProcess.plot(m3,"h",[6,7,8,9,10]);

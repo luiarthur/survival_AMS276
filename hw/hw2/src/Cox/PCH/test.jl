@@ -25,19 +25,29 @@ const N = length(t)
 
 ### PCH
 P = size(X,2)
-#grid = [0; quantile(t,linspace(0,1,10))]
-grid = collect(linspace(0,maximum(t),50))
+#grid = collect(linspace(0,maximum(t),10))
+grid = [0; quantile(t, linspace(0,1,10))]
 J = length(grid) - 1
-Σᵦ = sym(inv(X'X)) * 1.
+Σᵦ = sym(inv(X'X)) * 1.5
 priorβ = PCH.Priorβ(fill(0.,P), eye(P)*10., Σᵦ) 
 priorλ = PCH.Priorλ(fill(.1,J), fill(.1,J), eye(Float64,J)*1E-1)
-@time m2 = PCH.pch(t,X,v,grid,priorβ,priorλ,2000,10000,printFreq=500);
+@time m2 = PCH.pch(t,X,v,grid,priorβ,priorλ,2000,30000,printFreq=500);
 PCH.plot(m2,"beta",collect(1:P));
+PCH.plot(m2,"lambda",collect(1:4));
 println(R"coxph(Surv(lt,lv)~L)")
 s2 = PCH.summary(m2)
 println(s2)
 
-S = est_survival(m2, grid, 60., mean)
-PCH.plotsurv(grid, S, lwd=3, col_l=["black","blue","red","green"],
-            fg="grey",xlab="time", ylab="Survival Probability",
-            main="Probability of Survival for different Stages",addlines=true)
+S = est_survival(m2, grid, 60.)
+mean_S = mean(S,3)[:,:,1]'
+q_025_S = mapslices(s -> quantile(s,.025),S,3)[:,:,1]'
+q_975_S = mapslices(s -> quantile(s,.975),S,3)[:,:,1]'
+PCH.plotsurv(grid, mean_S, lwd=3, col_l=["black","blue","red","green"],
+             fg="grey",xlab="time", ylab="Survival Probability",
+             main="Probability of Survival for different Stages",addlines=true)
+PCH.plotsurv(grid, q_025_S, lwd=3, col_l=["black","blue","red","green"],
+             fg="grey",xlab="time", ylab="Survival Probability",add=false,
+             main="Probability of Survival for different Stages",addlines=true)
+PCH.plotsurv(grid, q_975_S, lwd=3, col_l=["black","blue","red","green"],
+             fg="grey",xlab="time", ylab="Survival Probability",add=false,
+             main="Probability of Survival for different Stages",addlines=true)

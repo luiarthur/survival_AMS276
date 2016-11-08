@@ -44,17 +44,18 @@ function show(io::IO, S::Summary_PCH)
   const J = length(S.λ̄)
   zeroInCI = S.quantile_β[:,2] .<= 0 .<= S.quantile_β[:,6]
 
-  @printf "%5s%10s%10s%3s\n" "" "mean" "std" "≠0"
+  @printf "%5s%10s%10s%10s%10s%3s\n" "" "mean" "std" "lower" "upper" "≠0"
   for p in 1:P
-    @printf "%5s%10.4f%10.4f%3s\n" string("β",p) S.β̄[p] S.std_β[p] zeroInCI[p] ? "" : "*"
+    @printf "%5s%10.4f%10.4f%10.4f%10.4f%3s\n" string("β",p) S.β̄[p] S.std_β[p] S.quantile_β[p,2] S.quantile_λ[p,6] zeroInCI[p] ? "" : "*"
   end
 
-  println(repeat("-",28))
+  println(repeat("-",48))
   for j in 1:J
-    @printf "%5s%10.4f%10.4f\n" string("λ",j) S.λ̄[j] S.std_λ[j]
+    #@printf "%5s%10.4f%10.4f\n" string("λ",j) S.λ̄[j] S.std_λ[j]
+    @printf "%5s%10.4f%10.4f%10.4f%10.4f\n" string("λ",j) S.λ̄[j] S.std_λ[j] S.quantile_λ[j,2] S.quantile_λ[j,6]
   end
 
-  println(repeat("-",28))
+  println(repeat("-",48))
   @printf "%5s%10.2f\n" "accβ:" S.accβ
   @printf "%5s%10.2f\n" "accλ:" S.accλ
   @printf "%5s%10.2f\n" "DIC" S.DIC

@@ -21,7 +21,7 @@ function est_survival(gp::Vector{State},grid::Vector{Float64},x::Vector{Float64}
 
   H₀(j::Int, h::Vector{Float64}) = sum(h[1:j])
 
-  const S = [exp(-H₀(j,h[b]) * (exp(x'beta[b])[1])) for j in 0:J, b in 1:B]
+  const S = [exp(-H₀(j,h[b]) * (exp(x'(beta[b]))[1])) for j in 0:J, b in 1:B]
   
   return S
 end

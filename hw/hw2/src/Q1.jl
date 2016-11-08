@@ -33,7 +33,8 @@ srand(276);
 ### Cox weibull
 Σ = Cox.Diag([.005,.01,.01])
 @time m1 = Cox.coxph_weibull(t,x,d,Σ,B=2000,burn=20000);
-println(Cox.Parametric.summary(m1))
+s1 = Cox.Parametric.summary(m1)
+println(s1)
 Cox.Parametric.plot(m1);
 t0 = collect(linspace(0,maximum(t),1000))
 mean_S_weib = Cox.Parametric.est_survival(m1, t0, [[0.],[1.]], mean)
@@ -61,20 +62,19 @@ Cox.PCH.plotsurv(grid, mean_S_pch, lwd=3, col_l=["blue","orange"],
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue))";
 
 ### GP
-@time m3 = Cox.GammaProcess.gp(t,x,d,10.,.1,2000,10000, printFreq=500);
+@time m3 = Cox.GammaProcess.gp(t,x,d,5.,.07,2000,10000, printFreq=500);
 s3 = Cox.GammaProcess.summary(m3)
-GammaProcess.plot(m3,"beta",[1,2,3,4]);
-GammaProcess.plot(m3,"h",[1,2,3,4,5]);
-GammaProcess.plot(m3,"h",[6,7,8,9,10]);
+Cox.GammaProcess.plot(m3,"beta", [1]);
+Cox.GammaProcess.plot(m3,"h",[1,2,3,4,5]);
+Cox.GammaProcess.plot(m3,"h",[6,7,8,9,10]);
 
-const grid = sort(unique([0;t]))
-age = 60.
-x0 = [[0,0,0,age],[1,0,0,age],[0,1,0,age],[0,0,1,age]]
-S3 = GammaProcess.est_survival(m3, grid, x0, mean)
-PCH.plotsurv(grid, S3, lwd=3, col_l=["black","blue","red","green"],
-             fg="grey",xlab="time", ylab="Survival Probability",
-             main="Probability of Survival for different Stages",addlines=true);
-R"lines(survfit(Surv(time,delta) ~ as.factor(stage), data=larynx))";
+grid_gp = sort(unique([0;t]))
+x0 = [[0.], [1.]]
+mean_S_gp = Cox.GammaProcess.est_survival(m3, grid_gp, x0, mean)
+Cox.PCH.plotsurv(grid_gp, mean_S_gp, lwd=3, col_l=["blue","orange"],
+                 fg="grey",xlab="time", ylab="Survival Probability",
+                 main="Probability of Survival for different Stages",addlines=true);
+R"lines(survfit(Surv(time,delta) ~ type, data = tongue))";
 
 ###
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
@@ -85,13 +85,20 @@ Cox.Parametric.plotsurv(t0,mean_S_weib, lwd=3, col_l=["blue","orange"],
 R"title(main='Parametric Cox Model',cex.main=2)"
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue))";
 R"""
-legend("topright",legend=c("diploid","aneuplod"),col=c("blue","orange"),bty="n",
+legend("topright",legend=c("aneuplod","diploid"),col=c("orange","blue"),bty="n",
        lwd=5,cex=3,text.col='grey')
 """
+
 Cox.PCH.plotsurv(grid, mean_S_pch, lwd=3, col_l=["blue","orange"],
+                 fg="grey",xlab="time", ylab="Survival Probability",
+                 addlines=true);
+R"title(main='PCH Cox Model',cex.main=2)"
+R"lines(survfit(Surv(time,delta) ~ type, data = tongue))";
+
+Cox.PCH.plotsurv(grid_gp, mean_S_gp, lwd=3, col_l=["blue","orange"],
              fg="grey",xlab="time", ylab="Survival Probability",
              addlines=true);
-R"title(main='PCH Cox Model',cex.main=2)"
+R"title(main='GP Cox Model',cex.main=2)"
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue))";
 R"par(mfrow=c(1,1))";
 

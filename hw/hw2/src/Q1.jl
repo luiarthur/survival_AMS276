@@ -44,7 +44,7 @@ param_025 = Cox.Parametric.est_survival(m1, t0, x0, m->quantile(m,.025))
 param_975 = Cox.Parametric.est_survival(m1, t0, x0, m->quantile(m,.975))
 Cox.PCH.plotCI(t0,[param_025[:,2] param_975[:,2]],col_area="orange",xlab="months")
 Cox.PCH.plotCI(t0,[param_025[:,1] param_975[:,1]],col_area=rgb(0,0,1,.5),add=true)
-Cox.PCH.plotsurv(grid, mean_S_pch, lwd=3, col_l=["blue","yellow"],
+Cox.PCH.plotsurv(t0, mean_S_weib, lwd=3, col_l=["blue","yellow"],
                  fg="grey",xlab="months", ylab="Survival Probability",
                  add=true,addlines=true);
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey30',lwd=2)";
@@ -94,26 +94,29 @@ R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey')";
 ###
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
 
+R"pdf('../img/survival.pdf',w=13,h=7)"
 R"par(mfrow=c(1,3))";
 # Parametric
-Cox.PCH.plotCI(t0,[param_025[:,2] param_975[:,2]],col_area="orange",ylab="Survival Probability",xlab="months")
+Cox.PCH.plotCI(t0,[param_025[:,2] param_975[:,2]],col_area="orange",
+               ylab="Survival Probability",xlab="months")
 Cox.PCH.plotCI(t0,[param_025[:,1] param_975[:,1]],col_area=rgb(0,0,1,.5),add=true)
-Cox.PCH.plotsurv(grid,mean_S_pch,lwd=3,col_l=["blue","yellow"],add=true);
+Cox.PCH.plotsurv(t0,mean_S_weib,lwd=3,col_l=["blue","yellow"],add=true);
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey',lwd=2)";
 R"title(main='Parametric Cox Model',cex.main=2,col.main='grey')"
 R"legend('topright',legend=c('Aneuplod','Diploid','KM'),text.col=c('orange','blue','grey'),bty='n', cex=3)"
 
 # PCH
-Cox.PCH.plotCI(grid,[pch_025[:,2] pch_975[:,2]],col_area="orange",ylab="")
+Cox.PCH.plotCI(grid,[pch_025[:,2] pch_975[:,2]],col_area="orange",ylab="",xlab="")
 Cox.PCH.plotCI(grid, [pch_025[:,1] pch_975[:,1]],add=true)
 Cox.PCH.plotsurv(grid, mean_S_pch, lwd=3, col_l=["blue","yellow"],add=true);
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey',lwd=2)";
 R"title(main='PCH Cox Model',cex.main=2,col.main='grey')"
 
 # GP
-Cox.PCH.plotCI(grid_gp, [gp_025[:,2] gp_975[:,2]],col_area="orange",ylab="")
+Cox.PCH.plotCI(grid_gp, [gp_025[:,2] gp_975[:,2]],col_area="orange",ylab="",xlab="")
 Cox.PCH.plotCI(grid_gp, [gp_025[:,1] gp_975[:,1]],add=true)
 Cox.PCH.plotsurv(grid_gp, mean_S_gp, lwd=3, col_l=["blue","yellow"],add=true);
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey',lwd=2)";
 R"title(main='Gamma Process Cox Model',cex.main=2,col.main='grey')"
 R"par(mfrow=c(1,1))";
+R"dev.off()"

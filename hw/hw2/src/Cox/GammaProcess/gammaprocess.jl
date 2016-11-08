@@ -35,15 +35,14 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   # Can be precomputed
   function part(j::Int) # (safe, death) sets
-    const risk = Vector{Int}() # Risl set
+    const risk = Vector{Int}() # Risk set
     #const safe  = Vector{Int}()  # Safe set: At risk but not failed (Rⱼ - Dⱼ)
     const death  = Vector{Int}()  # Death set: At risk and failed (Dⱼ)
     for i in 1:N
-      #if s(j-1) < t[i] <= s(j) && v[i] == 0
-      if t[i] > s(j)
-        #push!(safe,i)
+      if t[i] > s(j-1)
         push!(risk,i)
-      elseif s(j-1) < t[i] <= s(j) && v[i] == 1
+      end
+      if s(j-1) < t[i] <= s(j) && v[i] == 1
         push!(death,i)
       end
     end
@@ -53,6 +52,7 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   const safe = [part(j)[1] for j in 1:J]
   const death = [part(j)[2] for j in 1:J]
+  #return (safe,death)
 
   function loglike(β::Vector{Float64}, h::Vector{Float64}, j::Int)
     const Xb = X*β

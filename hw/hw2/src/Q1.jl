@@ -32,18 +32,26 @@ srand(276);
 
 ### Cox
 #=
-B = 10000; burn = 20000; Σ = Cox.Diag([.005,.01,.01])
-@time m1 = Cox.coxph_weibull(t,x,d,Σ,B=B,burn=burn);
-println(Cox.summary(m1))
-#Cox.plot(m1);
+Σ = Cox.Diag([.005,.01,.01])
+@time m1 = Cox.coxph_weibull(t,x,d,Σ,B=2000,burn=20000);
+println(Cox.Parametric.summary(m1))
+Cox.Parametric.plot(m1);
 println(R"coxph(Surv(time,delta) ~ type, data=tongue)")
 =#
 
 ### PCH
-J = 3
+J = 10
 grid = [0; quantile(t,linspace(0,1,J))]
-priorβ = Cox.Priorβ([0.], eye(1)*10., eye(1)*1E-5)
-priorλ = Cox.Priorλ(fill(.1,J), fill(.1,J), eye(Float64,J)*1E-5)
-@time m2 = Cox.pch(t,x,d,grid,priorβ,priorλ,10000,1000,printFreq=100)
+sym(X::Matrix{Float64}) = (X' + X) / 2
+Σᵦ = sym(inv(x'x)) * 5
+priorβ = Cox.Priorβ([0.], eye(1)*10., Σᵦ)
+priorλ = Cox.Priorλ(fill(.1,J), fill(.1,J), eye(Float64,J)*1E-1)
+@time m2 = Cox.pch(t,x,d,grid,priorβ,priorλ,2000,10000,printFreq=500)
+s2 = Cox.PCH.summary(m2)
 
-### FIX THE loglike and logprior in pch!!!
+x0 = [[0.], [1.]]
+mean_S_pch = Cox.PCH.est_survival(m2, grid, x0, mean)
+
+Cox.PCH.plotsurv(grid, mean_S_pch, lwd=3, col_l=["blue","orange"],
+             fg="grey",xlab="time", ylab="Survival Probability",
+             addlines=true)

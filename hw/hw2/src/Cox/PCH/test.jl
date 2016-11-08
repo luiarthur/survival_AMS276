@@ -1,5 +1,5 @@
 include("PCH.jl")
-include("../../est_survival.jl")
+#include("../../est_survival.jl")
 
 sym(M::Matrix{Float64}) = (M' + M) / 2
 
@@ -38,10 +38,10 @@ println(R"coxph(Surv(lt,lv)~L)")
 s2 = PCH.summary(m2)
 println(s2)
 
-S = est_survival(m2, grid, 60.)
-mean_S = mean(S,3)[:,:,1]'
-q_025_S = mapslices(s -> quantile(s,.025),S,3)[:,:,1]'
-q_975_S = mapslices(s -> quantile(s,.975),S,3)[:,:,1]'
+x0 = [[0,0,0,60.],[1,0,0,60.],[0,1,0,60.],[0,0,1,60.]]
+mean_S = PCH.est_survival(m2, grid, x0, mean)
+q_025_S = PCH.est_survival(m2, grid, x0, s->quantile(s,.025))
+q_975_S = PCH.est_survival(m2, grid, x0, s->quantile(s,.975))
 PCH.plotsurv(grid, mean_S, lwd=3, col_l=["black","blue","red","green"],
              fg="grey",xlab="time", ylab="Survival Probability",
              main="Probability of Survival for different Stages",addlines=true)

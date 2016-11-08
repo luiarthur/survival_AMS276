@@ -48,12 +48,21 @@ function show(io::IO, SL::Summary_lm)
   const P = length(SL.β̄)
   zeroInCI = SL.quantile_β[:,2] .<= 0 .<= SL.quantile_β[:,6]
 
-  @printf "%5s%10s%10s%3s\n" "" "mean" "std" "≠0"
-  for k in 1:P
-    @printf "%5s%10.4f%10.4f%3s\n" string("β",k) SL.β̄[k] SL.std_β[k] zeroInCI[k] ? "" : "*"
+  #@printf "%5s%10s%10s%3s\n" "" "mean" "std" "≠0"
+  #for k in 1:P
+  #  @printf "%5s%10.4f%10.4f%3s\n" string("β",k) SL.β̄[k] SL.std_β[k] zeroInCI[k] ? "" : "*"
+  #end
+
+  @printf "%5s%10s%10s%10s%10s%3s\n" "" "mean" "std" "lower" "upper" "≠0"
+  for p in 1:P
+    @printf "%5s%10.4f%10.4f%10.4f%10.4f%3s\n" string("β",p) SL.β̄[p] SL.std_β[p] SL.quantile_β[p,2] SL.quantile_β[p,6] zeroInCI[p] ? "" : "*"
   end
-  @printf "%5s%10.4f%10.4f\n" "α" SL.ᾱ SL.std_α
-  @printf "%5s%10.4f%10.4f\n" "λ" SL.λ̄ SL.std_λ
+
+
+
+  @printf "%5s%10.4f%10.4f%10.4f%10.4f\n" "α" SL.ᾱ SL.std_α SL.quantile_α[2] SL.quantile_α[6]
+  @printf "%5s%10.4f%10.4f%10.4f%10.4f\n" "λ" SL.λ̄ SL.std_λ SL.quantile_λ[2] SL.quantile_λ[6]  
+
   println(repeat("-",28))
   @printf "%5s%10.2f\n" "acc" SL.acc
   @printf "%5s%10.2f\n" "DIC" SL.DIC

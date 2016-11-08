@@ -22,7 +22,7 @@ const X = L
 const N = length(t)
 
 ### GP
-@time m3 = GammaProcess.gp(t,X,v,1.,.1,2000,1000, printFreq=500);
+@time m3 = GammaProcess.gp(t,X,v,1.,.1,2000,1000,c₀=1.,γ₀=10.,printFreq=500);
 s3 = GammaProcess.summary(m3)
 GammaProcess.plot(m3,"beta",[1,2,3,4]);
 GammaProcess.plot(m3,"h",[1,2,3,4,5]);

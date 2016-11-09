@@ -57,7 +57,7 @@ function pch(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   end
   
   logpriorβ(β::Vector{Float64}) = (-(β-priorβ.m)'S⁻¹ᵦ*(β-priorβ.m)/2)[1]
-  logprior_logλ(logλ::Vector{Float64}) = sum(-logλ.*(priorλ.a-1) - priorλ.b .* exp(logλ))
+  logprior_logλ(logλ::Vector{Float64}) = sum(logλ .* priorλ.a - priorλ.b .* exp(logλ))
 
   function ll_plus_lp(β::Vector{Float64},logλ::Vector{Float64})
     return logpriorβ(β) + logprior_logλ(logλ) + loglike(β,exp(logλ))

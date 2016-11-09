@@ -67,7 +67,7 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   
   logpriorβ(β::Vector{Float64}) = (-(β-priorᵦ.m)'S⁻¹ᵦ*(β-priorᵦ.m)/2)[1]
   function logprior_logh(logh::Vector{Float64}) 
-    return sum(-logh.*(priorₕ.ac-1) - priorₕ.c * exp(logh))
+    return sum(logh.*priorₕ.ac - priorₕ.c*exp(logh))
   end
 
   function ll_plus_lp(β::Vector{Float64},logh::Vector{Float64})

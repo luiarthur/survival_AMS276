@@ -53,8 +53,10 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   function loglike(β::Vector{Float64}, h::Vector{Float64}, j::Int)
     const Xb = X*β
-    -h[j] * sum([exp(Xb[i]) for i in safe[j]]) + # log survival
-    sum([log( 1-exp(-h[j]*exp(Xb[i])) ) for i in death[j]]) # log hazard
+    #-h[j] * sum([exp(Xb[i]) for i in safe[j]]) + # log survival
+    #sum([log( 1-exp(-h[j]*exp(Xb[i])) ) for i in death[j]]) # log hazard
+    -h[j] * sum(exp(Xb[safe[j]])) + # log survival
+    sum(log( 1-exp(-h[j]*exp(Xb[death[j]])) ) ) # log hazard
   end
 
   function loglike(β::Vector{Float64}, h::Vector{Float64})

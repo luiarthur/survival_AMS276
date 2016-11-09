@@ -33,11 +33,9 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   const S⁻¹ᵦ = inv(priorᵦ.S)
 
-  # Can be precomputed
   function part(j::Int) # (safe, death) sets
-    const risk = Vector{Int}() # Risk set
-    #const safe  = Vector{Int}()  # Safe set: At risk but not failed (Rⱼ - Dⱼ)
-    const death  = Vector{Int}()  # Death set: At risk and failed (Dⱼ)
+    const risk = Vector{Int}()   # Risk set: At risk as of interval j
+    const death  = Vector{Int}() # Death set: At risk and failed (Dⱼ)
     for i in 1:N
       if t[i] > s(j-1)
         push!(risk,i)
@@ -46,17 +44,15 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
         push!(death,i)
       end
     end
-    const safe = collect(setdiff(risk,death))
+    const safe = collect(setdiff(risk,death)) # Safe set: At risk but not failed (Rⱼ - Dⱼ)
     return (safe,death)
   end
 
   const safe = [part(j)[1] for j in 1:J]
   const death = [part(j)[2] for j in 1:J]
-  #return (safe,death)
 
   function loglike(β::Vector{Float64}, h::Vector{Float64}, j::Int)
     const Xb = X*β
-    #const (safe, death) = part(j)
     -h[j] * sum([exp(Xb[i]) for i in safe[j]]) + # log survival
     sum([log( 1-exp(-h[j]*exp(Xb[i])) ) for i in death[j]]) # log hazard
   end

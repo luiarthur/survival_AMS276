@@ -39,6 +39,8 @@ header-includes:
     - \usepackage{float}
     - \def\beginmyfig{\begin{figure}[H]\center}
     - \def\endmyfig{\end{figure}}
+    - \newcommand{\iid}{\overset{iid}{\sim}}
+    - \newcommand{\ind}{\overset{ind}{\sim}}
     # 
     - \allowdisplaybreaks
     - \def\M{\mathcal{M}}
@@ -52,12 +54,12 @@ The following Bayesian models were fit for this assignment:
 
 # a) Priors, Full Conditionals, and Joint Posteriors
 
-## $\M_1$: Weibull Model
+## $\M_1$: Proportional Hazards Model (Weibull hazard)
 
 Let $h(t|\beta,x) = h_0(t)\exp(x'\beta)$. Where $h_0(t)$ is a Weibull (baseline) hazard function of the form $h_0(t) = \alpha \lambda t^{\alpha-1}$. Then $S(t|\beta,x) = \exp(-\lambda t^\alpha)$, and the likelihood is 
 
 \begin{align*}
-\mathcal{L}(\beta, \alpha, \gamma | t) &\propto \prodl \bc{h(t_i|\beta,x_i)}^{\nu_i} S(t_i|\beta,x),
+\mathcal{L}(\beta, \alpha, \lambda | t, x, \nu) &= \prodl \bc{h(t_i|\beta,\alpha, \lambda,x_i)}^{\nu_i} S(t_i|\beta,\alpha,\lambda,x_i),
 \end{align*}
 
 where $\nu_i$ is 1 if observation $i$ is observed to be a failure, and 0 if the observation is right-censored. (Here, it is assumed observations belong to one of those classes.)
@@ -74,10 +76,52 @@ where the expected value of a Gamma($a$,$b$) random variable is $a/b$. The param
 
 The joint posterior is
 $$ 
-p(\beta,\alpha,\lambda|t,x,\nu) \propto  \mathcal{L}(\beta, \alpha, \gamma | t, x, \nu) p(\beta,\alpha,\lambda),
+p(\beta,\alpha,\lambda|t,x,\nu) \propto  \mathcal{L}(\beta, \alpha, \lambda | t, x, \nu) p(\beta,\alpha,\lambda),
 $$
+which can be sampled from via MCMC.
 
-which can be sampled from using MCMC.
+## $\M_2$: Piecewise Constant Hazard Model
+
+As in the previous model, the likelihood is 
+
+\begin{align*}
+\mathcal{L}(\beta | t, x, \nu) &= \prodl \bc{h(t_i|\beta,x_i)}^{\nu_i} S(t_i|\beta,x) \\
+&= \prodl \bc{h_0(t_i) \exp(x_i'\beta)}^{\nu_i} \exp\bc{-H_0(t_i)\exp(x_i'\beta)}\\
+\end{align*}
+
+Below are the definitions for $h_0(t)$ and $H_0(t)$.
+
+### The Hazard $h_0(t)$ and Cumulative Hazards $H_0(t)$
+
+Using the piecewise constant hazard model, flexible (Bayesian) nonparametric models can be constructed via nonparametric hazard functions. Before defining the hazard and cumulative hazard functions, a finite partition on the survival
+times axis ($t$) needs to be defined. We will define a grid with $J$ intervals to be $\mathbf{s} = \bc{s_{0}, s_{1}, ..., s_{J}}$, with $(s_0,s_1]$ being the first interval, and $(s_{J-1}, s_J]$ being the $J^{th}$ interval. We also impose the restrictions that $s_0 = 0$, $s_J >max(t_i)$, and $s_i < s_j$ for all $i < j$.
+One possible partition is constructed using the empirical quantiles of the observed times. Another possible partition could be the set of sorted, unique 
+observed survival times. Now we can define the baseline hazard as
+
+$$h_0(t_i|\lambda) = \sum_{j=1}^J \mathbbm{1}_{\bc{s_{j-1} < t_i \le s_j}} \p{\lambda_j} $$
+
+and the cumulative (baseline) hazard function as
+
+$$H_0(t_i|\lambda) = \lambda_g(t_i-s_{g-1})+ \sum_{\bc{j: s_j < t_i \cap j > 0}} \lambda_j(s_j-s_{j-1}),$$ where $g=\sup\bc{j: s_j > t_i}$.
+
+The model is fully specified after defining the prior distributions for
+$\beta$ and $\lambda_j$, for $j \in \bc{1,...,J}$. The priors I chose were
+
+\begin{align*}
+p(\beta) &\propto 1 \\
+\lambda_j &\ind Gamma(1/10,1/10)\\
+\end{align*}
+
+The joint posterior is
+$$ 
+p(\beta,\lambda|t,x,\nu) \propto  \mathcal{L}(\beta, \lambda | t, x, \nu) p(\beta,\lambda),
+$$
+which can be sampled from via MCMC.
+
+Note that the grid chosen for this problem was simply the quantiles of the observed times with 10 intervals (the quantiles being evenly spaced).
+
+## $\M_3$: Proportional hazards model using a Gamma Process for $H_0$
+
 
 # b) Posterior Distributions and Comparisons
 
@@ -130,7 +174,7 @@ $\lambda_{10}$    0.0645    0.0397    0.0121    0.1796
 
 Table: Posterior summary for parameters in $\M_2$ \label{stats2}
 
-Note that the acceptance rate for $\beta$ was 29% and that of $\lambda$ was 23%. 
+Note that the acceptance rate for $\beta$ was 29% and that of $\lambda$ was 32%. 
 
 ----------------------------------------------
    mean       std     lower     upper  $\ne0$

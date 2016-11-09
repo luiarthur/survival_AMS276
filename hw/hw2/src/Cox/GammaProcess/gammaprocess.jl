@@ -53,14 +53,24 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   function loglike(β::Vector{Float64}, h::Vector{Float64}, j::Int)
     const Xb = X*β
-    #-h[j] * sum([exp(Xb[i]) for i in safe[j]]) + # log survival
-    #sum([log( 1-exp(-h[j]*exp(Xb[i])) ) for i in death[j]]) # log hazard
+    #= Note that the original version of this function is slow:
+    -h[j] * sum([exp(Xb[i]) for i in safe[j]]) + # log survival
+    sum([log( 1-exp(-h[j]*exp(Xb[i])) ) for i in death[j]]) # log hazard
+    =#
     -h[j] * sum(exp(Xb[safe[j]])) + # log survival
-    sum(log( 1-exp(-h[j]*exp(Xb[death[j]])) ) ) # log hazard
+    sum(log( 1-exp(-h[j]*exp(Xb[death[j]])) )) # log hazard
   end
 
   function loglike(β::Vector{Float64}, h::Vector{Float64})
-    return sum([loglike(β, h, j) for j in 1:J])
+    #return sum([loglike(β, h, j) for j in 1:J])
+    const Xb = X*β
+    out = 0.
+    for j in 1:J
+      log_surv = -h[j] * sum(exp(Xb[safe[j]]))
+      log_haz = sum(log( 1-exp(-h[j]*exp(Xb[death[j]])) ))
+      out += log_surv + log_haz
+    end
+    return out
   end
   
   logpriorβ(β::Vector{Float64}) = (-(β-priorᵦ.m)'S⁻¹ᵦ*(β-priorᵦ.m)/2)[1]

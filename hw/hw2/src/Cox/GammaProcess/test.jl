@@ -22,7 +22,7 @@ const X = L
 const N = length(t)
 
 ### GP
-@time m3 = GammaProcess.gp(t,X,v,2.,.1,2000,1000,c=.01,printFreq=500);
+@time m3 = GammaProcess.gp(t,X,v,2.,.1,2000,10000,c=.01,printFreq=500);
 R"coxph(Surv(time,delta) ~ as.factor(stage) + age, data=larynx)"
 s3 = GammaProcess.summary(m3)
 GammaProcess.plot(m3,"beta",[1,2,3,4]);

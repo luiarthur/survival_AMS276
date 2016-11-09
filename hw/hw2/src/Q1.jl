@@ -50,6 +50,7 @@ Cox.PCH.plotsurv(t0, mean_S_weib, lwd=3, col_l=["blue","yellow"],
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey30',lwd=2)";
 
 ### PCH
+# Could have used: grid = sort(unique([0;t])). Results would be nicer.
 J = 10
 grid = [0; quantile(t,linspace(0,1,J))]
 sym(X::Matrix{Float64}) = (X' + X) / 2
@@ -73,8 +74,8 @@ R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey',lwd=2)";
 
 
 ### GP
-@time m3=Cox.GammaProcess.gp(t,x,d,10.,.07,2000,1000,
-                             c=1.,η=1.,κ=1.,printFreq=500);
+@time m3=Cox.GammaProcess.gp(t,x,d,10.,.07,2000,10000,
+                             c=.01,η=1.,κ=1.,printFreq=500);
 s3 = Cox.GammaProcess.summary(m3)
 println(s3)
 Cox.GammaProcess.plot(m3,"beta", [1]);
@@ -99,11 +100,11 @@ R"pdf('../img/survival.pdf',w=13,h=7)"
 R"par(mfrow=c(1,3))";
 # Parametric
 Cox.PCH.plotCI(t0,[param_025[:,2] param_975[:,2]],col_area="orange",
-               ylab="Survival Probability",xlab="months")
+               ylab="",xlab="")
 Cox.PCH.plotCI(t0,[param_025[:,1] param_975[:,1]],col_area=rgb(0,0,1,.5),add=true)
 Cox.PCH.plotsurv(t0,mean_S_weib,lwd=3,col_l=["blue","yellow"],add=true);
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey',lwd=2)";
-R"title(main='Parametric Cox Model',cex.main=2,col.main='grey30')"
+R"title(main='Parametric Cox Model',cex.main=2,col.main='grey30',xlab='months',ylab='Survival Probability',cex.lab=1.4)"
 R"legend('topright',legend=c('Aneuplod','Diploid','KM'),text.col=c('orange','blue','grey'),bty='n', cex=3)"
 
 # PCH

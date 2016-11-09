@@ -87,14 +87,14 @@ end # gp
 
 function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64}, 
             csᵦ::Float64, csₕ::Float64,
-            B::Int, burn::Int; γ₀::Float64=1., c₀::Float64=1., printFreq::Int=0)
+            B::Int, burn::Int; η::Float64=1., c::Float64=1., κ::Float64=1., printFreq::Int=0)
   const grid = sort(unique([0;t]))
   const J = length(grid)-1
-  const a = (grid[2:end] - grid[1:J]) * γ₀
+  const a = (grid[2:end].^κ - grid[1:J].^κ) * η
   const (N,P) = size(X)
   const Σᵦ = sym(inv(X'X))
   const priorᵦ = Priorᵦ(fill(0.,P), eye(P)*100., Σᵦ*csᵦ)
-  const priorₕ = Priorₕ(c₀, a*c₀, eye(J) * csₕ)
+  const priorₕ = Priorₕ(c, a*c, eye(J) * csₕ)
 
   return gp(t,X,v,grid, priorᵦ, priorₕ, B, burn, printFreq=printFreq)
 end

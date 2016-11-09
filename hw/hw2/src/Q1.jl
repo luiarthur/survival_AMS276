@@ -74,7 +74,8 @@ R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey',lwd=2)";
 
 
 ### GP
-@time m3=Cox.GammaProcess.gp(t,x,d,10.,.07,2000,10000,
+grid_gp = sort(unique([0;t]))
+@time m3=Cox.GammaProcess.gp(t,x,d,grid_gp, 10.,.07,2000,10000,
                              c=.01,η=1.,κ=1.,printFreq=500);
 s3 = Cox.GammaProcess.summary(m3)
 println(s3)
@@ -82,7 +83,6 @@ Cox.GammaProcess.plot(m3,"beta", [1]);
 Cox.GammaProcess.plot(m3,"h",[1,2,3,4,5]);
 Cox.GammaProcess.plot(m3,"h",[6,7,8,9,10]);
 
-grid_gp = sort(unique([0;t]))
 mean_S_gp = Cox.GammaProcess.est_survival(m3, grid_gp, x0, mean)
 gp_025 = Cox.GammaProcess.est_survival(m3, grid_gp, x0, m->quantile(m,.025))
 gp_975 = Cox.GammaProcess.est_survival(m3, grid_gp, x0, m->quantile(m,.975))

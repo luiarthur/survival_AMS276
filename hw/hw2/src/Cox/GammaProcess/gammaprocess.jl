@@ -78,16 +78,46 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   return MCMC.gibbs(init, update, B, burn, printFreq=printFreq)
 end # gp
 
+"""
+Gamma process
+
+    gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64}, 
+                csβ::Float64, csh::Float64,
+                B::Int, burn::Int; 
+                η::Float64=1., c::Float64=1., κ::Float64=1., printFreq::Int=0)
+
+
+# Arguments:
+* `t`:     time vector
+* `X`:     covariate matrix
+* `v`:     indicator for observed failure (1) or right-censorship (0)
+* `grid`:  grid locations to do nonparametric estimates. For example, `grid = sort(unique([0; t]))`, which is the default.
+* `csβ`:   proposal step-size (scale) for β vector (increase if accβ is too high, decrease if too low)
+* `csh`:   proposal step-size (scale) for h vector (increase if acch is too high, decrease if too low)
+* `B`:     number of mcmc samples
+* `burn`:  burn-in
+* `c,η,κ`: The baseline cumulative hazard H₀(t)∼ GammaProcess(c(ηtᵏ), c). 
+  * smaller `c` reflects higher prior uncertainty around the baseline cumulative hazard, which is Weibull.
+  * `c,η,κ` each have positive support
+"""
 function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64}, 
-            csᵦ::Float64, csₕ::Float64,
+            grid::Vector{Float64}, csβ::Float64, csh::Float64, 
             B::Int, burn::Int; η::Float64=1., c::Float64=1., κ::Float64=1., printFreq::Int=0)
-  const grid = sort(unique([0;t]))
+
   const J = length(grid)-1
   const a = (grid[2:end].^κ - grid[1:J].^κ) * η
   const (N,P) = size(X)
   const Σᵦ = sym(inv(X'X))
-  const priorᵦ = Priorᵦ(fill(0.,P), eye(P)*100., Σᵦ*csᵦ)
-  const priorₕ = Priorₕ(c, a*c, eye(J) * csₕ)
+  const priorᵦ = Priorᵦ(fill(0.,P), eye(P)*100., Σᵦ*csβ)
+  const priorₕ = Priorₕ(c, a*c, eye(J) * csh)
 
   return gp(t,X,v,grid, priorᵦ, priorₕ, B, burn, printFreq=printFreq)
 end
+
+function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64}, 
+            csβ::Float64, csh::Float64,
+            B::Int, burn::Int; η::Float64=1., c::Float64=1., κ::Float64=1., printFreq::Int=0)
+  const grid = sort(unique([0; t]))
+  gp(t,X,v,grid,csβ, csh, B, burn, η=η, c=c, κ=κ, printFreq=printFreq)
+end
+

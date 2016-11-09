@@ -105,7 +105,7 @@ Cox.PCH.plotCI(t0,[param_025[:,1] param_975[:,1]],col_area=rgb(0,0,1,.5),add=tru
 Cox.PCH.plotsurv(t0,mean_S_weib,lwd=3,col_l=["blue","yellow"],add=true);
 R"lines(survfit(Surv(time,delta) ~ type, data = tongue),col='grey',lwd=2)";
 R"title(main='Parametric Cox Model',cex.main=2,col.main='grey30',xlab='months',ylab='Survival Probability',cex.lab=1.4)"
-R"legend('topright',legend=c('Aneuplod','Diploid','KM'),text.col=c('orange','blue','grey'),bty='n', cex=3)"
+R"legend('topright',legend=c('Aneuploid','Diploid','KM'),text.col=c('orange','blue','grey'),bty='n', cex=3)"
 
 # PCH
 Cox.PCH.plotCI(grid,[pch_025[:,2] pch_975[:,2]],col_area="orange",ylab="",xlab="")

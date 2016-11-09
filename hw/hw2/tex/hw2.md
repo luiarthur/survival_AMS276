@@ -68,8 +68,8 @@ This model is fully specified after defining prior distributions for $\alpha, \l
 
 \begin{align*}
 p(\beta) &\propto 1 \\
-\alpha &\sim Gamma(1/10,1/10) \\
-\lambda &\sim Gamma(1/10,1/10), \\
+\alpha &\sim \text{Gamma}(1/10,1/10) \\
+\lambda &\sim \text{Gamma}(1/10,1/10), \\
 \end{align*}
 
 where the expected value of a Gamma($a$,$b$) random variable is $a/b$. The parameters are assumed to be independent apriori.
@@ -85,7 +85,7 @@ which can be sampled from via MCMC.
 As in the previous model, the likelihood is 
 
 \begin{align*}
-\mathcal{L}(\beta | t, x, \nu) &= \prodl \bc{h(t_i|\beta,x_i)}^{\nu_i} S(t_i|\beta,x) \\
+\mathcal{L}(\beta, \lambda | t, x, \nu) &= \prodl \bc{h(t_i|\beta,x_i)}^{\nu_i} S(t_i|\beta,x) \\
 &= \prodl \bc{h_0(t_i) \exp(x_i'\beta)}^{\nu_i} \exp\bc{-H_0(t_i)\exp(x_i'\beta)}\\
 \end{align*}
 
@@ -109,7 +109,7 @@ $\beta$ and $\lambda_j$, for $j \in \bc{1,...,J}$. The priors I chose were
 
 \begin{align*}
 p(\beta) &\propto 1 \\
-\lambda_j &\ind Gamma(1/10,1/10)\\
+\lambda_j &\ind \text{Gamma}(1/10,1/10)\\
 \end{align*}
 
 The joint posterior is
@@ -121,6 +121,27 @@ which can be sampled from via MCMC.
 Note that the grid chosen for this problem was simply the quantiles of the observed times with 10 intervals (the quantiles being evenly spaced).
 
 ## $\M_3$: Proportional hazards model using a Gamma Process for $H_0$
+[//]: # ( See slides 8. I still don't fully understand.)
+The likelihood can be specified by
+$$
+\mathcal{L}(\beta,h|X,t,\nu) \propto \exp\bc{-h_j \sum_{k\in R_j-D_j}e^{X_k\beta}} \prod_{l\in D_j}\p{1-\exp\bc{-h_j e^{X_l\beta}}}
+$$
+
+with priors for $\beta$ and $h$
+\begin{align*}
+p(\beta) &\propto 1 \\
+h_j &\ind \text{Gamma}(c\eta(s_j^\kappa - s_{j-1}^\kappa),c)
+\end{align*}
+
+I chose $(c,\eta,\kappa)$ to be (.001,1,1). A small value for $c$ reflects
+great prior uncertainty on the Weibull cumulative hazard baseline
+centering distribution in the Gamma Process.
+
+The joint posterior is
+$$ 
+p(\beta,h|t,x,\nu) \propto  \mathcal{L}(\beta, h | t, x, \nu) p(\beta,h),
+$$
+which can be sampled from via MCMC.
 
 
 # b) Posterior Distributions and Comparisons
@@ -199,9 +220,6 @@ frequentist results}
 
 ---
 
-Sorry for not writing more for the derivations, I spent too much time debugging this assignment...
-
----
 
 
 [//]: # ( example image embedding

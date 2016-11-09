@@ -67,14 +67,10 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
     return sum(logh.*priorₕ.ac - priorₕ.c*exp(logh))
   end
 
-  function ll_plus_lp(β::Vector{Float64},logh::Vector{Float64})
-    return logpriorβ(β) + logprior_logh(logh) + loglike(β,exp(logh))
-  end
-
   function update(curr::State)
     const curr_logh = log(curr.h)
-    const newβ = MCMC.metropolis(curr.β, priorᵦ.Σ, β->ll_plus_lp(β,curr_logh))
-    const new_logh = MCMC.metropolis(curr_logh, priorₕ.Σ, logh->ll_plus_lp(newβ,logh))
+    const newβ = MCMC.metropolis(curr.β, priorᵦ.Σ, β-> loglike(β,curr.h) + logpriorβ(β))
+    const new_logh = MCMC.metropolis(curr_logh, priorₕ.Σ, logh->loglike(newβ,exp(logh)) + logprior_logh(logh))
     return State(newβ, exp(new_logh))
   end
 

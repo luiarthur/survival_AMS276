@@ -1,3 +1,8 @@
+# Sex       1: Male, 2: Female
+# nu        1: observed failure, 0: right-censored
+# time      failure or censoring time
+# cluster   1-38, cluster number. Each should be repeated once.
+
 cluster	time	nu	Sex	Age
 1	8	1	1	28
 2	23	1	2	48

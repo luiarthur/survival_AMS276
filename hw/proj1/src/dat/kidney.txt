@@ -3,7 +3,7 @@
 # time      failure or censoring time
 # cluster   1-38, cluster number. Each should be repeated once.
 
-cluster	time	nu	Sex	Age
+cluster	time	nu	sex	age
 1	8	1	1	28
 2	23	1	2	48
 3	22	1	1	32

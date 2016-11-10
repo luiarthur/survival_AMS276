@@ -123,9 +123,11 @@ Note that the grid chosen for this problem was simply the quantiles of the obser
 ## $\M_3$: Proportional hazards model using a Gamma Process for $H_0$
 [//]: # ( See slides 8. I still don't fully understand.)
 The likelihood can be specified by
-$$
-\mathcal{L}(\beta,h|X,t,\nu) \propto \exp\bc{-h_j \sum_{k\in R_j-D_j}e^{X_k\beta}} \prod_{l\in D_j}\p{1-\exp\bc{-h_j e^{X_l\beta}}}
-$$
+
+\begin{align*}
+\mathcal{L}(\beta,h|X,t,\nu) &\propto \prod_{j=1}^J\bc{\exp\bc{-h_j \sum_{k\in R_j-D_j}e^{X_k\beta}} \prod_{l\in D_j}\p{1-\exp\bc{-h_j e^{X_l\beta}}}} \\
+&\p{= \prod_{j=1}^J S_j f_j???, \text{ where } f_j = P(l \in D_j)} \\
+\end{align*}
 
 with priors for $\beta$ and $h$
 \begin{align*}

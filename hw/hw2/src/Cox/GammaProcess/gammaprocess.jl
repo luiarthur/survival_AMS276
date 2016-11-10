@@ -55,9 +55,7 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
     const Xb = X*β
     out = 0.
     for j in 1:J
-      const log_surv = -h[j] * sum(exp(Xb[safe[j]]))
-      const log_haz = sum(log( 1-exp(-h[j]*exp(Xb[death[j]])) ))
-      out += log_surv + log_haz
+      out += -h[j]*sum(exp(Xb[safe[j]])) + sum(log(1-exp(-h[j]*exp(Xb[death[j]]))))
     end
     return out
   end
@@ -75,6 +73,14 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   end
 
   const init = State(priorᵦ.m, priorₕ.ac / priorₕ.c)
+
+  # Diagnostics: Probably should :ard code metropolis update
+  #@time loglike(init.β,init.h)
+  #@time loglike(init.β,init.h)
+  #@time logpriorβ(init.β)
+  #@time logpriorβ(init.β)
+  #@time logprior_logh(log(init.h))
+  #@time logprior_logh(log(init.h))
   return MCMC.gibbs(init, update, B, burn, printFreq=printFreq)
 end # gp
 

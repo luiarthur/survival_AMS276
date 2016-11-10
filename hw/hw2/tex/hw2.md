@@ -102,7 +102,7 @@ $$h_0(t_i|\lambda) = \sum_{j=1}^J \mathbbm{1}_{\bc{s_{j-1} < t_i \le s_j}} \p{\l
 
 and the cumulative (baseline) hazard function as
 
-$$H_0(t_i|\lambda) = \lambda_g(t_i-s_{g-1})+ \sum_{\bc{j: s_j < t_i \cap j > 0}} \lambda_j(s_j-s_{j-1}),$$ where $g=\sup\bc{j: s_j > t_i}$.
+$$H_0(t_i|\lambda) = \lambda_g(t_i-s_{g-1})+ \sum_{\bc{j: s_j < t_i \cap j > 0}} \lambda_j(s_j-s_{j-1}),$$ where $g=\inf\bc{j: s_j > t_i}$.
 
 The model is fully specified after defining the prior distributions for
 $\beta$ and $\lambda_j$, for $j \in \bc{1,...,J}$. The priors I chose were

@@ -74,13 +74,17 @@ function gp(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
 
   const init = State(priorᵦ.m, priorₕ.ac / priorₕ.c)
 
-  # Diagnostics: Probably should :ard code metropolis update
+  # Diagnostics: Time consuming part is probably the rand(MvNormal(currₕ,Σₕ)
   #@time loglike(init.β,init.h)
   #@time loglike(init.β,init.h)
   #@time logpriorβ(init.β)
   #@time logpriorβ(init.β)
   #@time logprior_logh(log(init.h))
   #@time logprior_logh(log(init.h))
+  #@time update(init)
+  #@time update(init)
+  #@time update(init)
+  #@time update(init)
   return MCMC.gibbs(init, update, B, burn, printFreq=printFreq)
 end # gp
 

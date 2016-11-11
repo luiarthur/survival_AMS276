@@ -44,7 +44,30 @@ header-includes:
     # 
     - \allowdisplaybreaks
     - \def\M{\mathcal{M}}
+    - \def\prodj{\prod_{j=1}^{m_i}}
+    - \def\exijb{\exp(x_{ij}'\beta)}
 ---
+
+
+## Full Conditionals
+
+The likelihood is
+
+\begin{align*}
+\mathcal{L}(w,\beta,\lambda,\alpha,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\nu_i} S(t_{ij}) \\
+&= \prodl\prodj \bc{\lambda\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\nu_i} \exp\bc{-\lambda t_{ij}^\alpha \exijb} \\
+\end{align*}
+
+The priors for the parameters are
+
+## Posterior Summaries
+
+## Interpretation of Posterior Estimates
+
+## Comparison to Frequentist Frailty Model
+
+
+[//]: # (Footnotes:)
 
 [//]: # ( example image embedding
 \beginmyfig
@@ -72,13 +95,3 @@ header-includes:
   \end{minipage}
 \end{figure*}
 )
-
-
-[//]: # (Footnotes:)
-
-[^1]: A common but alternate parameterization used for the extreme value distribution is 
-$$
-f_Y(y|\mu,\sigma) = \frac{1}{\sigma}\exp\bc{-\tx -\exp\p{-\tx}},~y\in\mathbb{R}
-$$
-where $\mu$ and $\sigma$ are location and scale parameters respectively.
-

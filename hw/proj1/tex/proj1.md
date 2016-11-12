@@ -33,7 +33,10 @@ header-includes:
     - \newcommand{\pd}[2]{ \frac{\partial#1}{\partial#2} }
     - \newcommand{\pdd}[2]{ \frac{\partial^2#1}{\partial{#2}^2} }
     - \newcommand{\N}{ \mathcal{N} }
+    - \renewcommand{\G}{ \text{Gamma} }
     - \newcommand{\E}{ \text{E} }
+    - \newcommand{\zero}{ \mathbf{0} }
+    - \newcommand{\I}{ \mathbf{I} }
     - \def\given{~\bigg|~}
     # Figures in correct place
     - \usepackage{float}
@@ -43,8 +46,10 @@ header-includes:
     - \newcommand{\ind}{\overset{ind}{\sim}}
     # 
     - \allowdisplaybreaks
-    - \def\M{\mathcal{M}}
     - \def\prodj{\prod_{j=1}^{m_i}}
+    - \def\sumj{\sum_{j=1}^{m_i}}
+    - \def\xij{x_{ij}}
+    - \def\tij{t_{ij}}
     - \def\exijb{\exp(x_{ij}'\beta)}
 ---
 
@@ -52,13 +57,35 @@ header-includes:
 ## Full Conditionals
 
 The likelihood is
-
 \begin{align*}
-\mathcal{L}(w,\beta,\lambda,\alpha,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\nu_i} S(t_{ij}) \\
+\mathcal{L}(\beta,\lambda,\alpha,w,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\nu_i} S(t_{ij}) \\
 &= \prodl\prodj \bc{\lambda\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\nu_i} \exp\bc{-\lambda t_{ij}^\alpha \exijb} \\
 \end{align*}
 
 The priors for the parameters are
+\begin{align*}
+\beta &\sim \N_2(m,S) \\
+\lambda &\sim \G(a_\lambda,b_\lambda) \\
+\alpha &\sim \G(a_\alpha,b_\alpha) \\
+w_i | \eta &\sim \G(\eta,\eta) \\
+\eta &\sim \G(a_\eta,b_\eta) \\
+\end{align*}
+where $\N_p(m,S)$ denotes the $p$-dimensional multivariate Normal distribution 
+with mean vector $m$ and covariance matrix $S$, and $\G(a,b)$ denotes the
+Gamma distribution with the mean being $a/b$. To reproduce the results from
+the study in ICS example 4.3, $m$ and $S$ were set to be
+$\zero_2$ and $10^3\I_2$ respectively. In addition, $(a_z, b_z)$ was set to be
+$(0.001,0.001)$ for $z\in\bc{\lambda,\alpha,\eta}$. 
+
+The resulting complete conditionals for each of the parameters are
+\begin{align*}
+p(\beta|\lambda,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \nu_i \xij'\beta - \lambda\tij^\alpha\exijb} \\
+\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml(m_i\nu_i), b_\lambda\suml\sumj\tij^\alpha\exijb}\\
+p(\alpha | \beta,\lambda,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+\suml m_i}\exp\bc{\alpha\p{-b_\alpha+\suml\nu_i\sumj\log\tij}-\lambda\suml\sumj\tij^\alpha\exijb}\\
+w | \beta,\lambda,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+m_i\nu_i,\eta}\\
+\eta | \beta,\lambda,\alpha,w,t,x,\nu &\sim \G(a_\eta, b_\eta+\suml m_i(w_i-\log w_i))\\
+\end{align*}
+
 
 ## Posterior Summaries
 

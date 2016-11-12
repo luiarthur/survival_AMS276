@@ -50,6 +50,7 @@ header-includes:
     - \def\sumj{\sum_{j=1}^{m_i}}
     - \def\xij{x_{ij}}
     - \def\tij{t_{ij}}
+    - \def\vij{\nu_{ij}}
     - \def\exijb{\exp(x_{ij}'\beta)}
 ---
 
@@ -58,8 +59,8 @@ header-includes:
 
 The likelihood is
 \begin{align*}
-\mathcal{L}(\beta,\lambda,\alpha,w,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\nu_i} S(t_{ij}) \\
-&= \prodl\prodj \bc{\lambda\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\nu_i} \exp\bc{-\lambda t_{ij}^\alpha \exijb} \\
+\mathcal{L}(\beta,\lambda,\alpha,w,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\vij} S(t_{ij}) \\
+&= \prodl\prodj \bc{\lambda\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\vij} \exp\bc{-\lambda t_{ij}^\alpha \exijb} \\
 \end{align*}
 
 The priors for the parameters are
@@ -79,10 +80,10 @@ $(0.001,0.001)$ for $z\in\bc{\lambda,\alpha,\eta}$.
 
 The resulting complete conditionals for each of the parameters are
 \begin{align*}
-p(\beta|\lambda,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \nu_i \xij'\beta - \lambda\tij^\alpha\exijb} \\
-\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml(m_i\nu_i), b_\lambda\suml\sumj\tij^\alpha\exijb}\\
-p(\alpha | \beta,\lambda,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+\suml m_i}\exp\bc{\alpha\p{-b_\alpha+\suml\nu_i\sumj\log\tij}-\lambda\suml\sumj\tij^\alpha\exijb}\\
-w | \beta,\lambda,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+m_i\nu_i,\eta}\\
+p(\beta|\lambda,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \vij \xij'\beta - \lambda\tij^\alpha\exijb} \\
+\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml\sumj\nu_i, b_\lambda\suml\sumj\tij^\alpha\exijb}\\
+p(\alpha | \beta,\lambda,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+\suml m_i}\exp\bc{\alpha\p{-b_\alpha+\suml\sumj\vij\log\tij}-\lambda\suml\sumj\tij^\alpha\exijb}\\
+w_i | \beta,\lambda,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+\sumj\vij,\eta}\\
 \eta | \beta,\lambda,\alpha,w,t,x,\nu &\sim \G(a_\eta, b_\eta+\suml m_i(w_i-\log w_i))\\
 \end{align*}
 

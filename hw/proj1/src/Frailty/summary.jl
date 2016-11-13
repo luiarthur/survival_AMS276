@@ -1,4 +1,4 @@
-function summary(v::Vector{Float64}; a::Float64=.05)
+function summary_v(v::Vector{Float64}; a::Float64=.05)
   const MEAN = mean(v)
   const SD = std(v)
   const ACC = length(unique(v)) / length(v)
@@ -7,16 +7,16 @@ function summary(v::Vector{Float64}; a::Float64=.05)
   return (MEAN,SD,ACC,q)
 end
 
-#function summary(vv::Vector{Vector{Float64}}; a::Float64=.05)
-#  const J = length(vv)
-#  const m = hcat(vv...)'
-#  const MEAN = map(m,1)
-#  const SD = std(m,1)
-#  const ACC = size(unique(m,1),1) / J
-#  const q = hcat([ quantile(m[:,j], [a/2, 1-a/2]) for j in 1:J ]...)'
-#
-#  return (MEAN,SD,ACC,q)
-#end
+function summary_vv(vv::Vector{Vector{Float64}}; a::Float64=.05)
+  const J = length(vv[1])
+  const m = hcat(vv...)'
+  const MEAN = mean(m,1)
+  const SD = std(m,1)
+  const ACC = size(unique(m,1),1) / length(vv)
+  const q = hcat([ quantile(m[:,j], [a/2, 1-a/2]) for j in 1:J ]...)'
+
+  return (MEAN,SD,ACC,q)
+end
 
 #immutable Summary_frailty
 #  β::

@@ -1,7 +1,7 @@
 module Frailty
 
 using Distributions, RCall
-import MCMC, Base.show, Base.summary
+import MCMC, Base.show
 
 export plot, summary, est_survival, fit, Prior_β, Prior_λ, Prior_α, Prior_η
 

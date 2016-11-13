@@ -35,7 +35,7 @@ function fit(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
              prior_α::Prior_α, prior_η::Prior_η,
              B::Int, burn::Int; printFreq::Int=0)
 
-  rig(a::Float64, b::Float64) = 1 / rand(Gamma(a, 1/b))
+  rg(a::Float64, b::Float64) = rand(Gamma(a, 1/b))
 
   const N = length(unique(group)) # number of groups
   const group_ind = [ find(g->g==i, group) for i in 1:N ]
@@ -70,9 +70,9 @@ function fit(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   end
 
   function update(s::State)
-    const new_λ = rig(a_λ_new, prior_λ.b + sum(t.^s.α .* exp(X*s.β)) )
+    const new_λ = rg(a_λ_new, prior_λ.b + sum(t.^s.α .* exp(X*s.β)) )
     #println("λ: ", new_λ)
-    const new_w = [ rig(s.η + sum(v[group_ind[i]]), s.η) for i in 1:N ]
+    const new_w = [ rg(s.η + sum(v[group_ind[i]]), s.η) for i in 1:N ]
     #println("w: ", new_w)
     const new_β = MCMC.metropolis(s.β,prior_β.cs,β->lfc_β(β,new_λ,s.α))
     #println("β: ", new_β)

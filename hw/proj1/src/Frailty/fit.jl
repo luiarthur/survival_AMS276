@@ -26,6 +26,7 @@ end
 immutable Prior_η
   a::Float64
   b::Float64
+  cs::Float64
 end
 
 function fit(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
@@ -34,7 +35,7 @@ function fit(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
              prior_α::Prior_α, prior_η::Prior_η,
              B::Int, burn::Int; printFreq::Int=0)
 
-  rig(a::Float64, b::Float64) = rand(Gamma(a, 1/b))
+  rig(a::Float64, b::Float64) = 1 / rand(Gamma(a, 1/b))
 
   const N = length(unique(group)) # number of groups
   const group_ind = [ find(g->g==i, group) for i in 1:N ]
@@ -59,17 +60,26 @@ function fit(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
     return out
   end
   
+  function lfc_η(η::Float64,w::Vector{Float64})
+    if η < 0
+      out = -Inf
+    else
+      out = N*(η*log(η)-lgamma(η)) + η*sum(log(w)) - η*(prior_η.b+sum(w)) + (prior_η.a-1)*log(η)
+    end
+    return out
+  end
 
   function update(s::State)
-    const new_λ = rig(a_λ_new, prior_λ.b + sum(exp(t.^s.α .* X*s.β)) )
-    println("λ: ", new_λ)
+    const new_λ = rig(a_λ_new, prior_λ.b + sum(t.^s.α .* exp(X*s.β)) )
+    #println("λ: ", new_λ)
     const new_w = [ rig(s.η + sum(v[group_ind[i]]), s.η) for i in 1:N ]
-    println("w: ", new_w)
+    #println("w: ", new_w)
     const new_β = MCMC.metropolis(s.β,prior_β.cs,β->lfc_β(β,new_λ,s.α))
-    println("β: ", new_β)
+    #println("β: ", new_β)
     const new_α = MCMC.metropolis(s.α,prior_α.cs,α->lfc_α(α,new_λ,new_β))
-    println("α: ", new_α)
-    const new_η = s.η # need to do this!
+    #println("α: ", new_α)
+    const new_η = MCMC.metropolis(s.η,prior_η.cs,η->lfc_η(η,new_w))
+    #println("η: ", new_η)
     
     return State(new_β, new_λ, new_α, new_w, new_η)
   end

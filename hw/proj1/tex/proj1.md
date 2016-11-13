@@ -81,10 +81,10 @@ $(0.001,0.001)$ for $z\in\bc{\lambda,\alpha,\eta}$.
 The resulting complete conditionals for each of the parameters are
 \begin{align*}
 p(\beta|\lambda,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \vij \xij'\beta - \lambda\tij^\alpha\exijb} \\
-\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml\sumj\nu_i, b_\lambda\suml\sumj\tij^\alpha\exijb}\\
+\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml\sumj\nu_i, b_\lambda+\suml\sumj\tij^\alpha\exijb}\\
 p(\alpha | \beta,\lambda,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+\suml m_i}\exp\bc{\alpha\p{-b_\alpha+\suml\sumj\vij\log\tij}-\lambda\suml\sumj\tij^\alpha\exijb}\\
 w_i | \beta,\lambda,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+\sumj\vij,\eta}\\
-\eta | \beta,\lambda,\alpha,w,t,x,\nu &\sim \G(a_\eta, b_\eta+\suml m_i(w_i-\log w_i))\\
+p(\eta | \beta,\lambda,\alpha,w,t,x,\nu) &\propto \p{\frac{\eta^\eta}{\Gamma(\eta)}}^N\p{\prodl w_i}^\eta \exp\p{-\eta(b_\eta+\suml w_i)}\eta^{a_\eta-1} \\
 \end{align*}
 
 

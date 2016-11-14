@@ -33,14 +33,24 @@ model = Frailty.summary(out)
 println(R"coxph(Surv(time,nu) ~ age+sex+frailty(cluster,theta=.54), data=kidney)")
 println(model)
 
+R"pdf('../img/beta.pdf')"
 plotpost(hcat(map(m->m.β,out)...)',cnames=["age","sex"]);
+R"dev.off()"
+
+R"pdf('../img/gamma.pdf')"
 plotpost(map(m->m.λ,out),main="gamma");
+R"dev.off()"
+R"pdf('../img/alpha.pdf')"
 plotpost(map(m->m.α,out),main="alpha");
+R"dev.off()"
+R"pdf('../img/eta.pdf')"
 plotpost(map(m->1/m.η,out),main="kappa = 1/eta");
+R"dev.off()"
 
 w_ci = model.w.q
 w_mean = model.w.MEAN
 @rput w_mean w_ci;
+R"pdf('w.pdf')"
 R"""
 tmp_N <- length(w_mean)
 plot(w_mean,tmp_N:1,xlim=c(0,4.5),pch=20,col="dodgerblue",cex=3,
@@ -49,6 +59,7 @@ plot(w_mean,tmp_N:1,xlim=c(0,4.5),pch=20,col="dodgerblue",cex=3,
 add.errbar(ci=w_ci,transpose=TRUE,x=tmp_N:1,col="dodgerblue",lwd=1,lty=2)
 axis(2,at=1:tmp_N,label=tmp_N:1,las=2,cex.axis=.8,col='grey')
 """;
+R"dev.off()"
 
 #=
 include("proj1.jl")

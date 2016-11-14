@@ -52,6 +52,7 @@ header-includes:
     - \def\tij{t_{ij}}
     - \def\vij{\nu_{ij}}
     - \def\exijb{\exp(x_{ij}'\beta)}
+    - \renewcommand{\arraystretch}{1.1}
 ---
 
 
@@ -90,10 +91,59 @@ p(\eta | \beta,\lambda,\alpha,w,t,x,\nu) &\propto \p{\frac{\eta^\eta}{\Gamma(\et
 
 
 ## Posterior Summaries
+Table 1 and 2 summarize the posterior distributions of the 
+model parameters. Figures \ref{fig:beta} to \ref{fig:eta}
+show the posterior distributions along with their traceplots.
+Note that the traceplots do not show (strong) evidence that
+the MCMC chain has not converged. Also note the acceptance
+rates in Table 1 seem to show good mixing. Figure \ref{fig:w} shows the
+posterior distribution of the frailties $w$.
+
+```include
+postTable.md
+```
+
+\beginmyfig
+\includegraphics[height=0.5\textwidth]{../img/beta.pdf}
+\caption{Posterior distribution for coefficients ($\beta$). Trace plots included in top right corner of each plot.}
+\label{fig:beta}
+\endmyfig
+
+\begin{figure*}[h]
+  \begin{minipage}{.3\linewidth}
+    \centering \includegraphics[height=1\textwidth]{../img/alpha.pdf}
+    \caption{Posterior distribution of $\alpha$}
+    \label{fig:alpha}
+  \end{minipage}\hfill
+  \begin{minipage}{.3\linewidth}
+    \centering \includegraphics[height=1\textwidth]{../img/gamma.pdf}
+    \caption{Posterior distribution of $\gamma$}
+    \label{fig:gamma}
+  \end{minipage}
+  \begin{minipage}{.3\linewidth}
+    \centering \includegraphics[height=1\textwidth]{../img/eta.pdf}
+    \caption{Posterior distribution of $\eta$}
+    \label{fig:eta}
+  \end{minipage}
+\end{figure*}
+
+\beginmyfig
+\includegraphics[height=0.5\textwidth]{../img/w.pdf}
+\caption{Posterior distribution for frailties ($w$). 95\% equal-tailed credible intervals are the dashed lines.}
+\label{fig:w}
+\endmyfig
+
+
 
 ## Interpretation of Posterior Estimates
 
 ## Comparison to Frequentist Frailty Model
+
+\newpage
+
+```include
+postw.md
+```
 
 
 [//]: # (Footnotes:)

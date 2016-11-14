@@ -46,40 +46,46 @@ function fit(t::Vector{Float64}, X::Matrix{Float64}, v::Vector{Float64},
   const a_λ_new = prior_λ.a + sum(v)
 
   # log full-conditionals for Metropolis-step
-  function lfc_β(β::Vector{Float64},λ::Float64,α::Float64)
+  function lfc_β(β::Vector{Float64},λ::Float64,α::Float64,w::Vector{Float64})
     const Xb = X*β
-    return -((β-prior_β.m)'S_inv*(β-prior_β.m)/2)[1] + sum(v.*Xb-λ*t.^α.*exp(Xb))
+    return (-(β-prior_β.m)'S_inv*(β-prior_β.m)/2)[1]+sum(v.*Xb-λ*t.^α.*w.*exp(Xb))
   end
 
-  function lfc_α(α::Float64,λ::Float64,β::Vector{Float64})
+  function lfc_α(α::Float64,λ::Float64,β::Vector{Float64},w::Vector{Float64})
     if α <= 0
       out = -Inf
     else
-      out = prior_α.a+sum(m)*log(α) + α*(-prior_α.b+sum(v.*log(t))) -λ*sum(t.^α.*exp(X*β))
+      out = (prior_α.a+sum(v)-1)*log(α) -α*prior_α.b + sum(α*v.*log(t)-λ*t.^α.*w.*exp(X*β))
     end
     return out
   end
   
   function lfc_η(η::Float64,w::Vector{Float64})
-    if η < 0
+    if η <= 0
       out = -Inf
     else
-      out = N*(η*log(η)-lgamma(η)) + η*sum(log(w)) - η*(prior_η.b+sum(w)) + (prior_η.a-1)*log(η)
+      out = N*(η*log(η)-lgamma(η)) - η*(prior_η.b+sum(w-log(w))) + (prior_η.a-1)*log(η)
+    end
+    return out
+  end
+
+  function samp_w(η::Float64, λ::Float64, α::Float64, β::Vector{Float64})
+    const Xb = X*β
+    out = Vector{Float64}(N)
+    for i in 1:N
+      idx = group_ind[i]
+      out[i] = rg(η + sum(v[idx]), η + λ*sum(t[idx].^α.*exp(Xb[idx])))
     end
     return out
   end
 
   function update(s::State)
-    const new_λ = rg(a_λ_new, prior_λ.b + sum(t.^s.α .* exp(X*s.β)) )
-    #println("λ: ", new_λ)
-    const new_w = [ rg(s.η + sum(v[group_ind[i]]), s.η) for i in 1:N ]
-    #println("w: ", new_w)
-    const new_β = MCMC.metropolis(s.β,prior_β.cs,β->lfc_β(β,new_λ,s.α))
-    #println("β: ", new_β)
-    const new_α = MCMC.metropolis(s.α,prior_α.cs,α->lfc_α(α,new_λ,new_β))
-    #println("α: ", new_α)
+    const new_w = samp_w(s.η, s.λ, s.α, s.β)
+    const ww = new_w[group]
+    const new_λ = rg(a_λ_new, prior_λ.b + sum(t.^s.α .* ww.* exp(X*s.β)))
+    const new_β = MCMC.metropolis(s.β,prior_β.cs,β->lfc_β(β,new_λ,s.α,ww))
+    const new_α = MCMC.metropolis(s.α,prior_α.cs,α->lfc_α(α,new_λ,new_β,ww))
     const new_η = MCMC.metropolis(s.η,prior_η.cs,η->lfc_η(η,new_w))
-    #println("η: ", new_η)
     
     return State(new_β, new_λ, new_α, new_w, new_η)
   end

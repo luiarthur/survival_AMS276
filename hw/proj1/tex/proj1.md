@@ -60,7 +60,7 @@ header-includes:
 The likelihood is
 \begin{align*}
 \mathcal{L}(\beta,\lambda,\alpha,w,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\vij} S(t_{ij}) \\
-&= \prodl\prodj \bc{\lambda\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\vij} \exp\bc{-\lambda t_{ij}^\alpha \exijb} \\
+&= \prodl\prodj \bc{\lambda\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\vij} \exp\bc{-\lambda t_{ij}^\alpha w_i\exijb} \\
 \end{align*}
 
 The priors for the parameters are
@@ -80,11 +80,12 @@ $(0.001,0.001)$ for $z\in\bc{\lambda,\alpha,\eta}$.
 
 The resulting complete conditionals for each of the parameters are
 \begin{align*}
-p(\beta|\lambda,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \vij \xij'\beta - \lambda\tij^\alpha\exijb} \\
-\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml\sumj\nu_i, b_\lambda+\suml\sumj\tij^\alpha\exijb}\\
-p(\alpha | \beta,\lambda,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+\suml m_i}\exp\bc{\alpha\p{-b_\alpha+\suml\sumj\vij\log\tij}-\lambda\suml\sumj\tij^\alpha\exijb}\\
-w_i | \beta,\lambda,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+\sumj\vij,\eta}\\
-p(\eta | \beta,\lambda,\alpha,w,t,x,\nu) &\propto \p{\frac{\eta^\eta}{\Gamma(\eta)}}^N\p{\prodl w_i}^\eta \exp\p{-\eta(b_\eta+\suml w_i)}\eta^{a_\eta-1} \\
+p(\beta|\lambda,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \vij \xij'\beta - \lambda\tij^\alpha w_i\exijb} \\
+\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml\sumj\nu_{ij}, b_\lambda+\suml\sumj\tij^\alpha w_i\exijb}\\
+p(\alpha | \beta,\lambda,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+(\suml\sumj\nu_{ij}) -1}\times\\
+&\exp\bc{-\alpha b_\alpha+\suml\sumj\alpha\vij\log\tij-\lambda\tij^\alpha w_i\exijb}\\
+w_i | \beta,\lambda,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+\sumj\vij,\eta+\lambda\sumj\tij^\alpha\exijb}\\
+p(\eta | \beta,\lambda,\alpha,w,t,x,\nu) &\propto \p{\frac{\eta^\eta}{\Gamma(\eta)}}^n\p{\prodl w_i}^\eta \exp\p{-\eta(b_\eta+\suml w_i)}\eta^{a_\eta-1} \\
 \end{align*}
 
 

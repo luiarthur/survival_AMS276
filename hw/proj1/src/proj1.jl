@@ -1,6 +1,8 @@
 println("Starting...")
 include("Frailty/Frailty.jl")
 using RCall
+R"library(rcommon)"
+plotpost = R"plotPosts"
 sym(M::Matrix{Float64}) = (M' + M) / 2
 srand(276);
 
@@ -11,30 +13,47 @@ model:
 R"""
 library(survival)
 kidney <- read.table("dat/kidney.txt",header=TRUE,skip=5)
-kidney$sex <- ifelse(kidney$sex==2, 0, 1) # M=1, F=0
-cox_mod <- coxph(Surv(time,nu) ~ sex+age, data=kidney)
-frail_mod <- coxph(Surv(time,nu) ~ sex+age+frailty(cluster,theta=1), data=kidney)
+kidney$sex <- ifelse(kidney$sex==2, 1, 0) # M=0, F=1
+frail_mod <- coxph(Surv(time,nu) ~ age+sex+frailty(cluster,theta=1), data=kidney)
 """;
 @rget kidney;
 
 const t = kidney[:time] * 1.;
-const X = [kidney[:sex] kidney[:age]] * 1.; # sex, age
+const X = [kidney[:age] kidney[:sex]] * 1.; # age, sex
 const v = kidney[:nu] * 1.;
 const group = convert(Vector{Int64},kidney[:cluster]);
 
-prior_β = Frailty.Prior_β(zeros(2), eye(2)*10^3, sym(inv(X'X))*10.)
+prior_β = Frailty.Prior_β(zeros(2), eye(2)*10^3, sym(inv(X'X))*5.)
 prior_λ = Frailty.Prior_λ(.001,.001)
 prior_α = Frailty.Prior_α(.001,.001,.1)
-prior_η = Frailty.Prior_η(.001,.001,.001)
+prior_η = Frailty.Prior_η(.001,.001,2)
 
 println(R"frail_mod")
-@time out = Frailty.fit(t,X,v,group,prior_β,prior_λ,prior_α,prior_η,2000,10000);
+@time out = Frailty.fit(t,X,v,group,prior_β,prior_λ,prior_α,prior_η,10000,1000);
 
-Frailty.summary_vv(map(m->m.β,out))
-Frailty.summary_v(map(m->m.λ,out))
-Frailty.summary_v(map(m->m.α,out))
-Frailty.summary_v(map(m->m.η,out))
-Frailty.summary_vv(map(m->m.w,out))
+β = Frailty.summary_vv(map(m->m.β,out))
+λ = Frailty.summary_v(map(m->m.λ,out)) # gibbs
+α = Frailty.summary_v(map(m->m.α,out))
+η = Frailty.summary_v(map(m->m.η,out))
+W = hcat(map(m->m.w,out)...)'
+w = Frailty.summary_vv(map(m->m.w,out)) # gibbs
+w_ci = w.q
+w_mean = w.MEAN
+
+plotpost(hcat(map(m->m.β,out)...)',cnames=["age","sex"]);
+plotpost(map(m->m.λ,out),main="gamma");
+plotpost(map(m->m.α,out),main="alpha");
+plotpost(map(m->1/m.η,out),main="kappa = 1/eta");
+
+@rput w_mean w_ci;
+R"""
+tmp_N <- length(w_mean)
+plot(w_mean,tmp_N:1,xlim=c(0,4.5),pch=20,col="dodgerblue",cex=3,
+     yaxt='n',bty='n',fg='grey',xlab='Frailty',ylab='Cluster',
+     main="Frailty by Cluster")
+add.errbar(ci=w_ci,transpose=TRUE,x=tmp_N:1,col="dodgerblue",lwd=1,lty=2)
+axis(2,at=1:tmp_N,label=tmp_N:1,las=2,cex.axis=.8,col='grey')
+""";
 
 #=
 include("proj1.jl")

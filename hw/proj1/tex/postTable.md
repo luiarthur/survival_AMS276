@@ -8,6 +8,7 @@ Parameter  &   mean   &   std  &  lower   & upper \\
  $\lambda$   &     0.0173  & 0.0159 &  0.0021  & 0.0626 \\
  $\alpha$   &     1.1961  & 0.1603 &  0.8229  & 1.4754 \\
  $\eta$   &     3.2465  & 4.7624 &  0.7583  &16.0787 \\
+ $\kappa$   &     0.5403  & 0.3186 &  0.0621  &1.3197 \\
 \hline
  $\beta$ acceptance  &     0.2941  &        &          &   \\
  $\alpha$ acceptance  &     0.3025  &        &          &   \\

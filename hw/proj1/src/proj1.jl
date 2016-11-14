@@ -30,7 +30,7 @@ prior_η = Frailty.Prior_η(.001,.001,2)
 @time out = Frailty.fit(t,X,v,group,prior_β,prior_λ,prior_α,prior_η,10000,1000);
 
 model = Frailty.summary(out)
-println(R"coxph(Surv(time,nu) ~ age+sex+frailty(cluster,theta=.54), data=kidney)")
+println(R"coxph(Surv(time,nu) ~ age+sex+frailty(cluster,distribution='gaussian'), data=kidney)")
 println(model)
 
 R"pdf('../img/beta.pdf')"
@@ -50,7 +50,7 @@ R"dev.off()"
 w_ci = model.w.q
 w_mean = model.w.MEAN
 @rput w_mean w_ci;
-R"pdf('w.pdf')"
+R"pdf('../img/w.pdf')"
 R"""
 tmp_N <- length(w_mean)
 plot(w_mean,tmp_N:1,xlim=c(0,4.5),pch=20,col="dodgerblue",cex=3,

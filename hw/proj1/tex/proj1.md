@@ -60,14 +60,14 @@ header-includes:
 
 The likelihood is
 \begin{align*}
-\mathcal{L}(\beta,\lambda,\alpha,w,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\vij} S(t_{ij}) \\
-&= \prodl\prodj \bc{\lambda\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\vij} \exp\bc{-\lambda t_{ij}^\alpha w_i\exijb} \\
+\mathcal{L}(\beta,\gamma,\alpha,w,\eta|t,X,\nu) &= \prodl\prodj h(t_{ij})^{\vij} S(t_{ij}) \\
+&= \prodl\prodj \bc{\gamma\alpha t_{ij}^{\alpha-1}w_i\exijb}^{\vij} \exp\bc{-\gamma t_{ij}^\alpha w_i\exijb} \\
 \end{align*}
 
 The priors for the parameters are
 \begin{align*}
 \beta &\sim \N_2(m,S) \\
-\lambda &\sim \G(a_\lambda,b_\lambda) \\
+\gamma &\sim \G(a_\gamma,b_\gamma) \\
 \alpha &\sim \G(a_\alpha,b_\alpha) \\
 w_i | \eta &\sim \G(\eta,\eta) \\
 \eta &\sim \G(a_\eta,b_\eta) \\
@@ -77,17 +77,20 @@ with mean vector $m$ and covariance matrix $S$, and $\G(a,b)$ denotes the
 Gamma distribution with the mean being $a/b$. To reproduce the results from
 the study in ICS example 4.3, $m$ and $S$ were set to be
 $\zero_2$ and $10^3\I_2$ respectively. In addition, $(a_z, b_z)$ was set to be
-$(0.001,0.001)$ for $z\in\bc{\lambda,\alpha,\eta}$. 
+$(0.001,0.001)$ for $z\in\bc{\gamma,\alpha,\eta}$. 
 
 The resulting complete conditionals for each of the parameters are
 \begin{align*}
-p(\beta|\lambda,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \vij \xij'\beta - \lambda\tij^\alpha w_i\exijb} \\
-\lambda | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\lambda + \suml\sumj\nu_{ij}, b_\lambda+\suml\sumj\tij^\alpha w_i\exijb}\\
-p(\alpha | \beta,\lambda,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+(\suml\sumj\nu_{ij}) -1}\times\\
-&\exp\bc{-\alpha b_\alpha+\suml\sumj\alpha\vij\log\tij-\lambda\tij^\alpha w_i\exijb}\\
-w_i | \beta,\lambda,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+\sumj\vij,\eta+\lambda\sumj\tij^\alpha\exijb}\\
-p(\eta | \beta,\lambda,\alpha,w,t,x,\nu) &\propto \p{\frac{\eta^\eta}{\Gamma(\eta)}}^n\p{\prodl w_i}^\eta \exp\p{-\eta(b_\eta+\suml w_i)}\eta^{a_\eta-1} \\
+p(\beta|\gamma,\alpha,w,\eta,t,x,\nu) &\propto \exp\bc{-\frac{(\beta-m)'S^{-1}(\beta-m)}{2}+\suml\sumj \vij \xij'\beta - \gamma\tij^\alpha w_i\exijb} \\
+\gamma | \beta,\alpha,w,\eta,t,x,\nu &\sim \G\p{a_\gamma + \suml\sumj\nu_{ij}, b_\gamma+\suml\sumj\tij^\alpha w_i\exijb}\\
+p(\alpha | \beta,\gamma,w,\eta,t,x,\nu) &\propto \alpha^{a_\alpha+(\suml\sumj\nu_{ij}) -1}\times\\
+&\exp\bc{-\alpha b_\alpha+\suml\sumj\alpha\vij\log\tij-\gamma\tij^\alpha w_i\exijb}\\
+w_i | \beta,\gamma,\alpha,\eta,t,x,\nu &\sim \G\p{\eta+\sumj\vij,\eta+\gamma\sumj\tij^\alpha\exijb}\\
+p(\eta | \beta,\gamma,\alpha,w,t,x,\nu) &\propto \p{\frac{\eta^\eta}{\Gamma(\eta)}}^n\p{\prodl w_i}^\eta \exp\p{-\eta(b_\eta+\suml w_i)}\eta^{a_\eta-1} \\
 \end{align*}
+
+This suggests that Gibbs-updates can be used to update $\gamma$ and 
+$w_i$.
 
 
 ## Posterior Summaries
@@ -97,7 +100,10 @@ show the posterior distributions along with their traceplots.
 Note that the traceplots do not show (strong) evidence that
 the MCMC chain has not converged. Also note the acceptance
 rates in Table 1 seem to show good mixing. Figure \ref{fig:w} shows the
-posterior distribution of the frailties $w$.
+posterior distribution of the frailties $w$. These results seem 
+comparable to the original results presented in the original research.
+Note that for the MCMC, 10000 MCMC samples were obtained after a burn-in
+period of 1000.
 
 ```include
 postTable.md
@@ -122,7 +128,7 @@ postTable.md
   \end{minipage}
   \begin{minipage}{.3\linewidth}
     \centering \includegraphics[height=1\textwidth]{../img/eta.pdf}
-    \caption{Posterior distribution of $\eta$}
+    \caption{Posterior distribution of $\kappa=1/\eta$}
     \label{fig:eta}
   \end{minipage}
 \end{figure*}
@@ -134,13 +140,45 @@ postTable.md
 \endmyfig
 
 
-
 ## Interpretation of Posterior Estimates
+
+- $\beta_{age}$: All else unchanged, patients who are one year older are $\widehat{\exp(\beta_{age})}$=1.008 times more at risk in terms of hazard of dying. Note that this is not very significant.
+- $\beta_{sex}$: All else unchanged, female patients are $\widehat{\exp(\beta_{sex})}$=0.189 times more at risk than males in terms of hazard of dying. More simply, **males are 5.28 times more at risk than females**.
+
+
+\newpage 
 
 ## Comparison to Frequentist Frailty Model
 
-\newpage
+Below is the output to a comparable frequentist frailty model.
 
+***
+
+```
+coxph(formula = Surv(time, nu) ~ age + sex + frailty(cluster,
+    distribution = "gaussian"), data = kidney)
+
+  n= 76, number of events= 58
+
+                          coef      se(coef) se2      Chisq DF    p
+age                        0.004713 0.01248  0.008557  0.14  1.00 0.7100
+sex                       -1.410822 0.44518  0.315038 10.04  1.00 0.0015
+frailty(cluster, distribu                             26.54 14.73 0.0290
+
+Iterations: 6 outer, 39 Newton-Raphson
+     Variance of random effect= 0.5691225
+Degrees of freedom for terms=  0.5  0.5 14.7
+Concordance= 0.82  (se = 0.046 )
+Likelihood ratio test= 47.55  on 15.7 df,   p=4.653e-05
+```
+
+***
+
+It appears that the estimated coefficients are comparable, as are the standard
+errors. The estimate for the variance of the random effect is 0.569, which
+is comparable to that of the Bayesian estimate (0.54).
+
+\newpage
 ```include
 postw.md
 ```

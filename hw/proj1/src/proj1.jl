@@ -14,7 +14,6 @@ R"""
 library(survival)
 kidney <- read.table("dat/kidney.txt",header=TRUE,skip=5)
 kidney$sex <- ifelse(kidney$sex==2, 1, 0) # M=0, F=1
-frail_mod <- coxph(Surv(time,nu) ~ age+sex+frailty(cluster,theta=1), data=kidney)
 """;
 @rget kidney;
 
@@ -28,23 +27,19 @@ prior_λ = Frailty.Prior_λ(.001,.001)
 prior_α = Frailty.Prior_α(.001,.001,.1)
 prior_η = Frailty.Prior_η(.001,.001,2)
 
-println(R"frail_mod")
 @time out = Frailty.fit(t,X,v,group,prior_β,prior_λ,prior_α,prior_η,10000,1000);
 
-β = Frailty.summary_vv(map(m->m.β,out))
-λ = Frailty.summary_v(map(m->m.λ,out)) # gibbs
-α = Frailty.summary_v(map(m->m.α,out))
-η = Frailty.summary_v(map(m->m.η,out))
-W = hcat(map(m->m.w,out)...)'
-w = Frailty.summary_vv(map(m->m.w,out)) # gibbs
-w_ci = w.q
-w_mean = w.MEAN
+model = Frailty.summary(out)
+println(R"coxph(Surv(time,nu) ~ age+sex+frailty(cluster,theta=.54), data=kidney)")
+println(model)
 
 plotpost(hcat(map(m->m.β,out)...)',cnames=["age","sex"]);
 plotpost(map(m->m.λ,out),main="gamma");
 plotpost(map(m->m.α,out),main="alpha");
 plotpost(map(m->1/m.η,out),main="kappa = 1/eta");
 
+w_ci = model.w.q
+w_mean = model.w.MEAN
 @rput w_mean w_ci;
 R"""
 tmp_N <- length(w_mean)

@@ -5,7 +5,7 @@
 # --natbib  =>  use the natbib package in latex
 # -o        =>  output file name
 
-pandoc proj1.md -s --filter pandoc-include -o proj1.tex
+pandoc proj1.md -s -o proj1.tex
 
 pdflatex *.tex
 bibtex *.aux

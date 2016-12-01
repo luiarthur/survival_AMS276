@@ -43,13 +43,13 @@ rownames(out_c1) <- paste0("Scenario",1:3)
 print(xtable(out_c1))
 
 ### Simulation: Cohort size = 3
-system.time(out1 <- foreach(i=1:N_sim) %dopar% sim(TR_p1,chrt_size=3))
-system.time(out2 <- foreach(i=1:N_sim) %dopar% sim(TR_p2,chrt_size=3))
-system.time(out3 <- foreach(i=1:N_sim) %dopar% sim(TR_p3,chrt_size=3))
+system.time(out13<- foreach(i=1:N_sim) %dopar% sim(TR_p1,chrt_size=3))
+system.time(out23<- foreach(i=1:N_sim) %dopar% sim(TR_p2,chrt_size=3))
+system.time(out33<- foreach(i=1:N_sim) %dopar% sim(TR_p3,chrt_size=3))
 
-out_c3 <- rbind(unlist(get.Stats(out1,TR_p1)),
-                unlist(get.Stats(out2,TR_p2)),
-                unlist(get.Stats(out3,TR_p3)))
+out_c3 <- rbind(unlist(get.Stats(out13,TR_p1)),
+                unlist(get.Stats(out23,TR_p2)),
+                unlist(get.Stats(out33,TR_p3)))
 rownames(out_c3) <- paste0("Scenario",1:3)
 
 print(xtable(out_c3))

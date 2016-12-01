@@ -52,9 +52,9 @@ header-includes:
   \hline
  & Dose1 & Dose2 & Dose3 & Dose4 & Dose5 & percRecTrueMTD & overallPercDLT \\ 
   \hline
-Scenario1 & 0.09 & 0.20 & 0.33 & 0.28 & 0.10 & 0.58 & 0.32 \\ 
-  Scenario2 & 0.07 & 0.13 & 0.32 & 0.30 & 0.18 & 0.60 & 0.28 \\ 
-  Scenario3 & 0.19 & 0.27 & 0.31 & 0.18 & 0.05 & 0.58 & 0.35 \\ 
+Scenario1 & 0.04 & 0.15 & 0.46 & 0.29 & 0.06 & 0.58 & 0.32 \\ 
+  Scenario2 & 0.02 & 0.08 & 0.30 & 0.43 & 0.18 & 0.60 & 0.28 \\ 
+  Scenario3 & 0.16 & 0.39 & 0.31 & 0.12 & 0.01 & 0.58 & 0.35 \\ 
    \hline
 \end{tabular}
 \end{table}
@@ -65,9 +65,9 @@ Scenario1 & 0.09 & 0.20 & 0.33 & 0.28 & 0.10 & 0.58 & 0.32 \\
   \hline
  & Dose1 & Dose2 & Dose3 & Dose4 & Dose5 & percRecTrueMTD & overallPercDLT \\ 
   \hline
-Scenario1 & 0.05 & 0.17 & 0.40 & 0.23 & 0.14 & 0.58 & 0.33 \\ 
-  Scenario2 & 0.03 & 0.08 & 0.40 & 0.31 & 0.18 & 0.52 & 0.27 \\ 
-  Scenario3 & 0.17 & 0.32 & 0.39 & 0.07 & 0.05 & 0.57 & 0.37 \\ 
+Scenario1 & 0.03 & 0.14 & 0.54 & 0.21 & 0.08 & 0.58 & 0.33 \\ 
+  Scenario2 & 0.02 & 0.06 & 0.40 & 0.34 & 0.18 & 0.52 & 0.27 \\ 
+  Scenario3 & 0.16 & 0.34 & 0.42 & 0.05 & 0.03 & 0.57 & 0.37 \\ 
    \hline
 \end{tabular}
 \end{table}

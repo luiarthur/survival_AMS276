@@ -22,8 +22,8 @@ get.Stats <- function(out,TR_p) {
   perc.doses <- rep(0,5)
   names(perc.doses) <- 1:5
   ls.tab <- sapply(out,function(o) o$a)
-  for (l in ls.tab) for (d in as.numeric(names(l))) 
-    perc.doses[d] <- perc.doses[d]+1
+  for (tab in ls.tab) for (d in as.numeric(names(tab))) 
+    perc.doses[d] <- perc.doses[d]+tab[as.character(d)]
 
   perc.doses <- perc.doses / sum(perc.doses)
 

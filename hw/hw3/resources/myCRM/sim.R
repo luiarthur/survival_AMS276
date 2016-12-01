@@ -12,13 +12,20 @@ TR_p3 <- c(0.15, 0.30, 0.45, 0.60, 0.85)  ### scenario 3
 
 get.Stats <- function(out,TR_p) {
   # Find % of patients treated at dose level 5
-  perc.at.dose <- function(tab, d) {
-    hasDose <- as.character(d) %in% names(tab)
-    if (!hasDose) 0 else tab[which(names(tab) == as.character(d))] / sum(tab)
-  }
-  perc.at.each.dose <- function(tab) sapply(1:5,function(d) perc.at.dose(tab,d))
-  perc.doses <- apply(sapply(out, function(o) perc.at.each.dose(o$a)),1,mean)
+  #perc.at.dose <- function(tab, d) {
+  #  hasDose <- as.character(d) %in% names(tab)
+  #  if (!hasDose) 0 else tab[which(names(tab) == as.character(d))] / sum(tab)
+  #}
+  #perc.at.each.dose <- function(tab) sapply(1:5,function(d) perc.at.dose(tab,d))
+  #perc.doses <- apply(sapply(out, function(o) perc.at.each.dose(o$a)),1,mean)
+  #names(perc.doses) <- 1:5
+  perc.doses <- rep(0,5)
   names(perc.doses) <- 1:5
+  ls.tab <- sapply(out,function(o) o$a)
+  for (l in ls.tab) for (d in as.numeric(names(l))) 
+    perc.doses[d] <- perc.doses[d]+1
+
+  perc.doses <- perc.doses / sum(perc.doses)
 
   # Find % of trials recommending the true MTD (maximum tolerated dose) as the MTD
   chosen.MTD <- sapply(out, function(o) o$c)

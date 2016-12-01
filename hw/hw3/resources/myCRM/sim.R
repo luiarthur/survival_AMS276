@@ -1,5 +1,6 @@
 library(doMC)
-registerDoMC(8)
+library(xtable)
+registerDoMC(16)
 set.seed(1)
 
 source("CRM.R")
@@ -29,14 +30,26 @@ get.Stats <- function(out,TR_p) {
   list(percDoses=perc.doses, percRecTrueMTD=perc.rec.true.MTD, overallPercDLT=overall.perc.DLT)
 }
 
-### Simulation:
+### Simulation: Cohort size = 1
 system.time(out1 <- foreach(i=1:N_sim) %dopar% sim(TR_p1,chrt_size=1))
 system.time(out2 <- foreach(i=1:N_sim) %dopar% sim(TR_p2,chrt_size=1))
 system.time(out3 <- foreach(i=1:N_sim) %dopar% sim(TR_p3,chrt_size=1))
 
-out <- rbind(unlist(get.Stats(out1,TR_p1)),
-             unlist(get.Stats(out2,TR_p2)),
-             unlist(get.Stats(out3,TR_p3)))
-rownames(out) <- paste0("Scenario",1:3)
+out_c1 <- rbind(unlist(get.Stats(out1,TR_p1)),
+                unlist(get.Stats(out2,TR_p2)),
+                unlist(get.Stats(out3,TR_p3)))
+rownames(out_c1) <- paste0("Scenario",1:3)
 
-print(out)
+print(xtable(out_c1))
+
+### Simulation: Cohort size = 3
+system.time(out1 <- foreach(i=1:N_sim) %dopar% sim(TR_p1,chrt_size=3))
+system.time(out2 <- foreach(i=1:N_sim) %dopar% sim(TR_p2,chrt_size=3))
+system.time(out3 <- foreach(i=1:N_sim) %dopar% sim(TR_p3,chrt_size=3))
+
+out_c3 <- rbind(unlist(get.Stats(out1,TR_p1)),
+                unlist(get.Stats(out2,TR_p2)),
+                unlist(get.Stats(out3,TR_p3)))
+rownames(out_c3) <- paste0("Scenario",1:3)
+
+print(xtable(out_c3))

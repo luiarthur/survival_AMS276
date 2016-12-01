@@ -46,11 +46,32 @@ header-includes:
     - \def\M{\mathcal{M}}
 ---
 
+# Simulation Results
+
+The tables below summarize the simulation results. For all
+scenario , where the true MTD is dose 3, a larger proportion of
+patients receive the true MTD level under a cohort size of 3. 
+In Scenario 2, the percentage of patients that receive a dose 
+level greater than the true MTD is the same for both cohorts.
+But in Scenario 3 (where the true MTD is dose 2), the 
+percentage of patients that receive a dose level of 3, is greater in the simulation with a cohort of 3. The proportion
+of patients that receive a dose level of 4 is much smaller
+in the simulation with a cohort of 3, though.
+
+The proportion of instances where the recommended MTD is
+the true MTD is the same in both simulations for scenario
+1 and 3. But the proportion of instances where recommended MTD is the true MTD is greater in the first simulation in scenario 2
+where the true MTD is high (low toxicity scenario). 
+
+The overall percent of DLT is about the same in both simulations.
+
 \begin{table}[ht]
 \centering
-\begin{tabular}{rrrrrrrr}
+\caption{Cohort of 1}
+\begin{tabular}{rrrrrrcc}
+\\
   \hline
- & Dose1 & Dose2 & Dose3 & Dose4 & Dose5 & percRecTrueMTD & overallPercDLT \\ 
+ & Dose1 & Dose2 & Dose3 & Dose4 & Dose5 & Recommend True MTD & overall DLT \\ 
   \hline
 Scenario1 & 0.04 & 0.15 & 0.46 & 0.29 & 0.06 & 0.58 & 0.32 \\ 
   Scenario2 & 0.02 & 0.08 & 0.30 & 0.43 & 0.18 & 0.60 & 0.28 \\ 
@@ -61,9 +82,11 @@ Scenario1 & 0.04 & 0.15 & 0.46 & 0.29 & 0.06 & 0.58 & 0.32 \\
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{rrrrrrrr}
+\caption{Cohort of 3}
+\begin{tabular}{rrrrrrcc}
+  \\
   \hline
- & Dose1 & Dose2 & Dose3 & Dose4 & Dose5 & percRecTrueMTD & overallPercDLT \\ 
+ & Dose1 & Dose2 & Dose3 & Dose4 & Dose5 & Recommend True MTD & overall DLT \\ 
   \hline
 Scenario1 & 0.03 & 0.14 & 0.54 & 0.21 & 0.08 & 0.58 & 0.33 \\ 
   Scenario2 & 0.02 & 0.06 & 0.40 & 0.34 & 0.18 & 0.52 & 0.27 \\ 

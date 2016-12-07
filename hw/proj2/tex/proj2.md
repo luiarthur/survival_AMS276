@@ -46,7 +46,32 @@ header-includes:
     - \def\M{\mathcal{M}}
 ---
 
----
+In the Figures below, the blue lines represent the probability of efficacy
+($\pi_n(CR)$) and the red lines represent the probability of toxicity 
+($\pi_n(TOX)$). Note that in Scenario 1 (Figure \ref{fig:sim1}), early 
+stopping is desired as the true probability of a toxicity event is .4 and
+that of an efficacy event is .2. This is indeed the case. Note that the blue
+vertical lines represent stops for futility, and the red vertical lines
+represent stops for toxicity.
+
+In Scenario 2, (Figure \ref{fig:sim1}), early stopping is not desired as the true
+probability of a toxicity event is .2 and that of an efficacy event is .4. 
+Again, we can note that only in one of the five simulations was there
+an early stop for futility, and there were no other stops. 
+
+\beginmyfig
+\includegraphics[height=0.6\textwidth]{../img/sim1.pdf}
+\caption{Scenario 1: $p_{\text{TRUE}}(\text{CR}) = .2$; $~p_{\text{TRUE}}(\text{TOX}) = .4$;}
+\label{fig:sim1}
+\endmyfig
+
+\beginmyfig
+\includegraphics[height=0.6\textwidth]{../img/sim2.pdf}
+\caption{Scenario 2: $p_{\text{TRUE}}(\text{CR}) = .4$; $~p_{\text{TRUE}}(\text{TOX}) = .2$;}
+\label{fig:sim2}
+\endmyfig
+
+
 
 [//]: # ( example image embedding
 \beginmyfig
